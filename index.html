@@ -223,8 +223,8 @@
             justify-content: space-between;
         }
         .history-date { font-size: 14px; color: var(--text-secondary); }
-        .history-expand-icon { font-size: 14px; color: var(--text-secondary); }
-        .history-item.open .history-expand-icon { transform: rotate(180deg); display: inline-block; }
+        .history-expand-icon { font-size: 14px; color: var(--text-secondary); transition: transform 0.2s; display: inline-block; }
+        .history-item.open .history-expand-icon { transform: rotate(180deg); }
         .history-preview {
             font-family: monospace;
             font-size: 12px;
@@ -283,6 +283,7 @@
     <div id="installBanner" class="install-banner" style="display: none;">📲 Установить приложение</div>
     <div id="toast" class="toast"></div>
 
+    <!-- ПРИВЕТСТВИЕ -->
     <div id="welcomeScreen" class="screen active">
         <div class="header-row">
             <div class="header-left"></div>
@@ -297,6 +298,7 @@
         <footer style="text-align: center; font-size: 12px; margin-top: 30px;">Первая в истории конторы приблуда для упрощения еженедельной рутины. Навайбкодил с любовью</footer>
     </div>
 
+    <!-- РЕДАКТОР (заголовок изменён на "СкладРасклад") -->
     <div id="editorScreen" class="screen">
         <div class="header-row">
             <div class="header-left"><button id="backToWelcomeFromEditor" class="nav-btn btn-secondary">←</button></div>
@@ -313,6 +315,7 @@
         <div id="modelsContainer"></div>
     </div>
 
+    <!-- ПРЕВЬЮ -->
     <div id="previewScreen" class="screen">
         <div class="header-row">
             <div class="header-left"><button id="backToEditorFromPreview" class="nav-btn btn-secondary">←</button></div>
@@ -326,6 +329,7 @@
         </div>
     </div>
 
+    <!-- ИСТОРИЯ -->
     <div id="historyScreen" class="screen">
         <div class="header-row">
             <div class="header-left"><button id="backToWelcomeFromHistory" class="nav-btn btn-secondary">←</button></div>
@@ -340,7 +344,7 @@
 
 <script>
 (function(){
-    // ---------- ГРУППИРОВКА МОДЕЛЕЙ ----------
+    // ---------- МОДЕЛИ (группы) ----------
     const GROUPS = [
         { name: "X", variants: ["64", "256"] },
         { name: "XS", variants: ["64", "256", "512"] },
@@ -371,6 +375,21 @@
         { name: "16 Pro Max", variants: ["256", "512", "1TB"] }
     ];
 
+    // Цвета с уточнённым названием для жёлтого
+    const colorNames = {
+        "🖤": "чёрный",
+        "🤍": "белый",
+        "💛": "жёлтый / золотой / пустынный титан",
+        "🧡": "коралловый",
+        "💚": "зелёный",
+        "💙": "синий",
+        "💜": "фиолетовый",
+        "❤️": "красный",
+        "🩷": "розовый",
+        "🩶": "титан"
+    };
+
+    // Функция определения цветов для полного имени модели
     function getColorsForFullModel(fullModel) {
         if (fullModel.startsWith("X ")) return ["🖤", "🤍"];
         if (fullModel.includes("XS")) return ["🖤", "🤍", "💛"];
@@ -397,12 +416,7 @@
         return ["🖤", "🤍", "💛", "💚", "💙", "❤️", "🩷"];
     }
 
-    const colorNames = {
-        "🖤": "чёрный", "🤍": "белый", "💛": "жёлтый / золотой / пустынный титан", "🧡": "коралловый",
-        "💚": "зелёный", "💙": "синий", "💜": "фиолетовый", "❤️": "красный",
-        "🩷": "розовый", "🩶": "титан"
-    };
-
+    // ---------- ДАННЫЕ ----------
     let stock = {};
     let history = [];
     let searchTerm = "";
@@ -498,18 +512,19 @@
         saveHistory();
     }
 
-    // --- СНЯТИЕ ФОКУСА ДЛЯ УДОБСТВА НА ТЕЛЕФОНЕ ---
     function blurActive() {
         if (document.activeElement && document.activeElement.blur) {
             document.activeElement.blur();
         }
     }
 
+    // ---------- ОТРИСОВКА РЕДАКТОРА ----------
     function renderEditor() {
-        blurActive(); // убираем фокус с любого поля перед перерисовкой
+        blurActive();
         const container = document.getElementById("modelsContainer");
         if (!container) return;
 
+        // Сохраняем открытые группы
         const currentOpen = new Set();
         document.querySelectorAll("#modelsContainer details[open]").forEach(d => {
             const summary = d.querySelector("summary");
@@ -532,6 +547,7 @@
             const groupDiv = document.createElement("div");
             groupDiv.className = "group-content";
 
+            // чипсы памяти
             const chipBar = document.createElement("div");
             chipBar.className = "chip-bar";
             for (let v of group.variants) {
@@ -615,6 +631,7 @@
         }
     }
 
+    // ---------- ИСТОРИЯ ----------
     function renderHistory() {
         const container = document.getElementById("historyList");
         const emptyMsg = document.getElementById("historyEmptyMsg");
@@ -704,6 +721,7 @@
         else alert("Не удалось скопировать автоматически. Скопируйте вручную:\n\n" + text);
     }
 
+    // ---------- УПРАВЛЕНИЕ ЭКРАНАМИ С ИСТОРИЕЙ НАВИГАЦИИ ----------
     function showScreen(name) {
         document.getElementById("welcomeScreen").classList.remove("active");
         document.getElementById("editorScreen").classList.remove("active");
@@ -711,35 +729,63 @@
         document.getElementById("historyScreen").classList.remove("active");
         document.getElementById(name + "Screen").classList.add("active");
         if (name === "history") renderHistory();
-        if (name === "editor") renderEditor();\
-        history.pushState(null, null);
+        if (name === "editor") renderEditor();
+        // Добавляем состояние в историю браузера, чтобы кнопка назад работала корректно
+        history.pushState({ screen: name }, "");
     }
 
+    // Обработчик кнопки "назад" (свайп)
+    window.addEventListener('popstate', function(event) {
+        let currentScreen = null;
+        if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
+        else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
+        else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
+        else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
+
+        if (currentScreen === 'editor') {
+            showScreen('welcome');
+        } else if (currentScreen === 'preview') {
+            showScreen('editor');
+        } else if (currentScreen === 'history') {
+            showScreen('welcome');
+        }
+        // На welcome ничего не делаем, браузер закроет приложение
+    });
+
+    // ---------- ТЕМНАЯ ТЕМА ----------
     function initTheme() {
         const saved = localStorage.getItem("theme");
         const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (saved === "dark" || (!saved && dark)) document.body.classList.add("dark");
-        else document.body.classList.remove("dark");
-        updateThemeButtons();
-    }
-    function updateThemeButtons() {
-        const isDark = document.body.classList.contains("dark");
-        document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
-            if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙";
-        });
+        if (saved === "dark" || (!saved && dark)) {
+            document.body.classList.add("dark");
+            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
+                if (btn.textContent === "🌙") btn.textContent = "☀️";
+            });
+        } else {
+            document.body.classList.remove("dark");
+            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
+                if (btn.textContent === "☀️") btn.textContent = "🌙";
+            });
+        }
     }
     function toggleTheme() {
         if (document.body.classList.contains("dark")) {
             document.body.classList.remove("dark");
             localStorage.setItem("theme", "light");
+            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
+                if (btn.textContent === "☀️") btn.textContent = "🌙";
+            });
         } else {
             document.body.classList.add("dark");
             localStorage.setItem("theme", "dark");
+            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
+                if (btn.textContent === "🌙") btn.textContent = "☀️";
+            });
         }
-        updateThemeButtons();
     }
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!localStorage.getItem("theme")) initTheme(); });
 
+    // ---------- PWA УСТАНОВКА ----------
     let deferredPrompt;
     window.addEventListener("beforeinstallprompt", (e) => {
         e.preventDefault();
@@ -759,10 +805,8 @@
         navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(e=>console.log);
     }
 
+    // ---------- ЗАПУСК ----------
     document.addEventListener("DOMContentLoaded", () => {
-
-// Добавляем начальное состояние
-history.pushState(null, null);
         loadData();
         initTheme();
         renderEditor();
@@ -806,30 +850,6 @@ history.pushState(null, null);
 
         showScreen("welcome");
     });
-     // Обработка кнопки назад (свайпа) в PWA
-window.addEventListener('popstate', function(event) {
-    let currentScreen = null;
-    if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
-    else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
-    else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
-    else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
-    
-    if (currentScreen === 'editor') {
-        event.preventDefault();
-        showScreen('welcome');
-        history.pushState(null, null);
-    } else if (currentScreen === 'preview') {
-        event.preventDefault();
-        showScreen('editor');
-        history.pushState(null, null);
-    } else if (currentScreen === 'history') {
-        event.preventDefault();
-        showScreen('welcome');
-        history.pushState(null, null);
-    } else {
-        // На главном экране – разрешаем выход (ничего не делаем)
-    }
-});
 })();
 </script>
 </body>
