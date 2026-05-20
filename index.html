@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>СкладРасклад</title>
-    <meta name="theme-color" content="#121212" media="prefers-color-scheme: dark">
-    <meta name="theme-color" content="#f0f2f5" media="prefers-color-scheme: light">
+    <meta name="theme-color" id="themeColorMeta" content="#f0f2f5">
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./icon-64.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -34,62 +33,45 @@
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Единая шапка для всех экранов */
+        /* Универсальная шапка с абсолютным позиционированием кнопок */
         .app-header {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 16px;
-        padding: 4px 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 4px 0;
         }
         .app-header h1 {
-        font-size: 1.2rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, var(--primary), #6c5ce7);
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        text-align: center;
-        margin: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 70%;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), #6c5ce7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
         }
         .welcome-header h1 {
-        font-size: 1.6rem;
+            font-size: 1.6rem;
         }
-        /* Кнопки с абсолютным позиционированием для всех экранов */
         .app-header .icon-btn:first-child {
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
         .app-header .icon-btn:last-child {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
-        .icon-btn {
-        background: var(--surface);
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 30px;
-        font-size: 1.3rem;
-        cursor: pointer;
-        color: var(--text-primary);
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: var(--shadow-sm);
-        flex-shrink: 0;
-}
         .icon-btn {
             background: var(--surface);
             border: none;
@@ -192,7 +174,7 @@
         .history-chevron { font-size: 1.1rem; color: var(--text-tertiary); }
         .toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-page); padding: 8px 18px; border-radius: 40px; font-size: 0.8rem; z-index: 210; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; box-shadow: var(--shadow-md); }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-tertiary); }
-        @media (max-width: 480px) { .app-header h1 { font-size: 1rem; } .welcome-header .app-header h1 { font-size: 1.3rem; } }
+        @media (max-width: 480px) { .app-header h1 { font-size: 1rem; } .welcome-header h1 { font-size: 1.3rem; } }
     </style>
 </head>
 <body>
@@ -200,10 +182,10 @@
 <div class="app-container">
     <!-- ЭКРАН ПРИВЕТСТВИЯ -->
     <div id="welcomeScreen" class="screen active">
-    <div class="app-header welcome-header">
-    <h1>СкладРасклад</h1>
-    <button id="welcomeThemeToggle" class="icon-btn">🌙</button>
-    </div>
+        <div class="app-header welcome-header">
+            <h1>СкладРасклад</h1>
+            <button id="welcomeThemeToggle" class="icon-btn">🌙</button>
+        </div>
         <div class="card" style="text-align: center; padding: 32px 20px;">
             <img src="./icon-256.png" alt="logo" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 16px;">
             <p style="margin: 16px 0 24px; color: var(--text-secondary); font-size: 1rem;">Создаватель склад-расклада :D</p>
@@ -488,9 +470,34 @@
     function goBack() { let screens = ["welcome", "editor", "history"]; let idx = screens.indexOf(currentScreenId); if (idx > 0) showScreen(screens[idx-1]); else showToast("Вы на главном экране"); }
     window.addEventListener("popstate", (e) => { let hash = window.location.hash.slice(1); if (["welcome","editor","history"].includes(hash)) showScreen(hash); else showScreen("welcome"); });
     window.history.replaceState({ screen: "welcome" }, "", "#welcome");
-    function initTheme() { let saved = localStorage.getItem("theme"); let dark = window.matchMedia("(prefers-color-scheme: dark)").matches; if (saved === "dark" || (!saved && dark)) document.body.classList.add("dark"); else document.body.classList.remove("dark"); updateThemeButtons(); }
+    
+    function updateThemeColor() {
+        const isDark = document.body.classList.contains("dark");
+        const color = isDark ? '#121212' : '#f0f2f5';
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', color);
+    }
+    
+    function initTheme() {
+        let saved = localStorage.getItem("theme");
+        let dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (saved === "dark" || (!saved && dark)) document.body.classList.add("dark");
+        else document.body.classList.remove("dark");
+        updateThemeColor();
+        updateThemeButtons();
+    }
     function updateThemeButtons() { let isDark = document.body.classList.contains("dark"); document.querySelectorAll(".icon-btn, #welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => { if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙"; }); }
-    function toggleTheme() { if (document.body.classList.contains("dark")) { document.body.classList.remove("dark"); localStorage.setItem("theme", "light"); } else { document.body.classList.add("dark"); localStorage.setItem("theme", "dark"); } updateThemeButtons(); }
+    function toggleTheme() {
+        if (document.body.classList.contains("dark")) {
+            document.body.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+        } else {
+            document.body.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+        }
+        updateThemeColor();
+        updateThemeButtons();
+    }
     let deferredPrompt; window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; });
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(console.error); }); }
     document.addEventListener("DOMContentLoaded", () => {
