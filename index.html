@@ -699,7 +699,7 @@ function renderHistory() {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
             const id = parseInt(btn.dataset.id);
-            if (confirm("Удалить этот отчёт?")) {
+            if (confirm("Удалить этот склад-расклад?")) {
                 history = history.filter(h => h.id !== id);
                 saveHistory();
                 renderHistory(); // перерисовываем
