@@ -738,33 +738,64 @@ function renderHistory() {
         else alert("Не удалось скопировать автоматически. Скопируйте вручную:\n\n" + text);
     }
 
-    // Управление экранами с историей навигации (для кнопки назад)
-    function showScreen(name) {
-        document.getElementById("welcomeScreen").classList.remove("active");
-        document.getElementById("editorScreen").classList.remove("active");
-        document.getElementById("previewScreen").classList.remove("active");
-        document.getElementById("historyScreen").classList.remove("active");
-        document.getElementById(name + "Screen").classList.add("active");
-        if (name === "history") renderHistory();
-        if (name === "editor") renderEditor();
+   let navigationStack = ['welcome'];
+
+function showScreen(name, addToHistory = true) {
+    // Переключаем видимость
+    document.getElementById("welcomeScreen").classList.remove("active");
+    document.getElementById("editorScreen").classList.remove("active");
+    document.getElementById("previewScreen").classList.remove("active");
+    document.getElementById("historyScreen").classList.remove("active");
+    document.getElementById(name + "Screen").classList.add("active");
+    
+    if (name === "history") renderHistory();
+    if (name === "editor") renderEditor();
+    
+    // Управляем историей браузера (только для PWA)
+    if (addToHistory && navigationStack[navigationStack.length-1] !== name) {
+        navigationStack.push(name);
         history.pushState({ screen: name }, "");
     }
+}
 
-    window.addEventListener('popstate', function(event) {
-        let currentScreen = null;
-        if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
-        else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
-        else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
-        else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
+// Обработчик кнопки "назад" (свайп)
+window.addEventListener('popstate', function(event) {
+    // Получаем текущий активный экран
+    let currentScreen = null;
+    if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
+    else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
+    else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
+    else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
+    
+    // Логика перехода назад
+    if (currentScreen === 'editor') {
+        // Из редактора -> на главный экран
+        if (navigationStack.length > 1) navigationStack.pop();
+        showScreen('welcome', false);
+    } 
+    else if (currentScreen === 'preview') {
+        // Из превью -> в редактор
+        if (navigationStack.length > 1) navigationStack.pop();
+        showScreen('editor', false);
+    } 
+    else if (currentScreen === 'history') {
+        // Из истории -> на главный экран
+        if (navigationStack.length > 1) navigationStack.pop();
+        showScreen('welcome', false);
+    }
+    // На главном экране ничего не делаем – браузер сам закроет приложение
+    
+    // Убираем лишнее состояние, если оно появилось
+    if (event.state && event.state.screen) {
+        // Не добавляем дубликаты
+    }
+});
 
-        if (currentScreen === 'editor') {
-            showScreen('welcome');
-        } else if (currentScreen === 'preview') {
-            showScreen('editor');
-        } else if (currentScreen === 'history') {
-            showScreen('welcome');
-        }
-    });
+// Инициализация навигации при загрузке страницы
+function initNavigation() {
+    navigationStack = ['welcome'];
+    history.replaceState({ screen: 'welcome' }, ""); // заменяем начальное состояние
+}
 
     // Тёмная тема с динамическим цветом статус-бара
     function initTheme() {
