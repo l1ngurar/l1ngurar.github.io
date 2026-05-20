@@ -760,30 +760,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-            // Обработка кнопки назад (свайпа) в PWA
-window.addEventListener('popstate', function(event) {
-    let currentScreen = null;
-    if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
-    else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
-    else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
-    else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
-    
-    if (currentScreen === 'editor') {
-        event.preventDefault();
-        showScreen('welcome');
-        history.pushState(null, null);
-    } else if (currentScreen === 'preview') {
-        event.preventDefault();
-        showScreen('editor');
-        history.pushState(null, null);
-    } else if (currentScreen === 'history') {
-        event.preventDefault();
-        showScreen('welcome');
-        history.pushState(null, null);
-    } else {
-        // На главном экране – разрешаем выход (ничего не делаем)
-    }
-});
 
 // Добавляем начальное состояние
 history.pushState(null, null);
@@ -830,6 +806,30 @@ history.pushState(null, null);
 
         showScreen("welcome");
     });
+     // Обработка кнопки назад (свайпа) в PWA
+window.addEventListener('popstate', function(event) {
+    let currentScreen = null;
+    if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
+    else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
+    else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
+    else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
+    
+    if (currentScreen === 'editor') {
+        event.preventDefault();
+        showScreen('welcome');
+        history.pushState(null, null);
+    } else if (currentScreen === 'preview') {
+        event.preventDefault();
+        showScreen('editor');
+        history.pushState(null, null);
+    } else if (currentScreen === 'history') {
+        event.preventDefault();
+        showScreen('welcome');
+        history.pushState(null, null);
+    } else {
+        // На главном экране – разрешаем выход (ничего не делаем)
+    }
+});
 })();
 </script>
 </body>
