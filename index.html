@@ -208,16 +208,29 @@
             height: 38px;
             padding: 0;
         }
-        .counter input {
-            width: 60px;
-            text-align: center;
-            font-size: 18px;
-            border: 1px solid var(--input-border);
-            border-radius: 30px;
-            padding: 6px 0;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            font-family: monospace;
+       .counter input {
+        width: 60px;
+        height: 36px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        border: 1px solid var(--input-border);
+        border-radius: 30px;
+        padding: 0;
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-family: monospace;
+        line-height: 1;
+        /* Убираем стандартные стрелки (спиннер) */
+        -moz-appearance: textfield;
+        appearance: textfield;
+        }
+
+        /* Для Chrome, Safari, Edge, Opera */
+        .counter input::-webkit-outer-spin-button,
+        .counter input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
         }
         .preview-box {
             background: var(--preview-bg);
