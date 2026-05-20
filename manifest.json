@@ -1,20 +1,14 @@
 {
   "name": "СкладРасклад",
   "short_name": "СкладРасклад",
-  "start_url": ".",
+  "start_url": "./",
   "display": "standalone",
   "theme_color": "#121212",
-  "background_color": "#ffffff",
+  "background_color": "#f0f2f5",
   "icons": [
     {
       "src": "icon-64.png",
       "sizes": "64x64",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-128.png",
-      "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },

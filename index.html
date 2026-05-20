@@ -2,970 +2,487 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>СкладРасклад</title>
-    <meta name="theme-color" id="theme-color-meta" content="#f0f2f5">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="СкладРасклад">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="64x64" href="icon-64.png">
-    <link rel="apple-touch-icon" href="icon-256.png">
+    <meta name="theme-color" content="#121212" media="prefers-color-scheme: dark">
+    <meta name="theme-color" content="#f0f2f5" media="prefers-color-scheme: light">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./icon-64.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-body: #f0f2f5;
-            --bg-card: #ffffff;
-            --text-primary: #1e2a36;
-            --text-secondary: #2c3e50;
-            --border-light: #eef2f7;
-            --counter-bg: #f8f9fa;
-            --input-border: #ddd;
-            --input-bg: white;
-            --btn-primary-bg: #1e88e5;
-            --btn-primary-text: white;
-            --btn-danger-bg: #ffebee;
-            --btn-danger-text: #c62828;
-            --btn-default-bg: white;
-            --btn-default-border: #ccc;
-            --history-item-bg: #fafafa;
-            --search-bg: white;
-            --search-border: #ddd;
-            --preview-bg: #1e2a36;
-            --preview-text: #eef2ff;
-            --toast-bg: rgba(0,0,0,0.8);
-            --toast-text: white;
-            --chip-active-bg: #1e88e5;
-            --chip-active-text: white;
-            --chip-bg: #f0f0f0;
+            --bg-page: #f8f9fc; --surface: #ffffff; --surface-2: #f1f3f7;
+            --text-primary: #1c2a3a; --text-secondary: #5b6e8c; --text-tertiary: #8e9eae;
+            --border: #e9edf2; --primary: #1e88e5; --primary-dark: #0b5e9e;
+            --danger: #e53935; --danger-bg: #ffebee;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08); --transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --radius-card: 24px; --radius-btn: 40px; --overlay-bg: rgba(0,0,0,0.5);
         }
         body.dark {
-            --bg-body: #121212;
-            --bg-card: #1e1e2f;
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --border-light: #2a2a3a;
-            --counter-bg: #2c2c3a;
-            --input-border: #444;
-            --input-bg: #2a2a2a;
-            --btn-primary-bg: #0d6efd;
-            --btn-primary-text: white;
-            --btn-danger-bg: #3e1a1a;
-            --btn-danger-text: #ff8a8a;
-            --btn-default-bg: #2a2a2a;
-            --btn-default-border: #555;
-            --history-item-bg: #252536;
-            --search-bg: #2a2a2a;
-            --search-border: #555;
-            --preview-bg: #0a0a12;
-            --preview-text: #d0d0ff;
-            --toast-bg: rgba(255,255,255,0.9);
-            --toast-text: #121212;
-            --chip-bg: #2c2c3a;
-            --chip-active-bg: #0d6efd;
+            --bg-page: #121212; --surface: #1e1e2a; --surface-2: #2a2a36;
+            --text-primary: #eceef2; --text-secondary: #a3b3c6; --text-tertiary: #6c7a8e;
+            --border: #2c2c3a; --primary: #0d6efd; --primary-dark: #0a58ca;
+            --danger: #ff7b72; --danger-bg: #3e1a1a;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3); --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+            --overlay-bg: rgba(0,0,0,0.7);
         }
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-body);
-            margin: 0;
-            padding: 16px;
-            padding-bottom: 80px;
-            color: var(--text-primary);
-        }
-        .container { max-width: 800px; margin: 0 auto; }
-        .screen { display: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-page); color: var(--text-primary); line-height: 1.3; padding-bottom: 65px; }
+        .app-container { max-width: 700px; margin: 0 auto; padding: 12px 16px 20px; }
+        .screen { display: none; animation: fadeIn 0.25s ease; }
         .screen.active { display: block; }
-        h1 { font-size: 1.6rem; margin: 0; text-align: center; }
-        .header-row {
-            display: flex;
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Единая шапка для всех экранов */
+        .app-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
             gap: 8px;
+            margin-bottom: 16px;
+            padding: 4px 0;
         }
-        .header-left, .header-right { width: 48px; display: flex; }
-        .header-left { justify-content: flex-start; }
-        .header-right { justify-content: flex-end; }
-        .header-center { flex: 1; text-align: center; }
-        .toolbar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-        .toolbar button { flex: 1 1 auto; min-width: 120px; }
-        .search-bar { margin-bottom: 20px; }
-        .search-bar input {
-            width: 100%; padding: 12px 16px; border-radius: 40px;
-            border: 1px solid var(--search-border);
-            background: var(--search-bg);
-            color: var(--text-primary);
-            font-size: 16px;
-            outline: none;
-        }
-        button {
-            background: var(--btn-default-bg);
-            border: 1px solid var(--btn-default-border);
-            padding: 8px 18px;
-            border-radius: 40px;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-        button:active { transform: scale(0.97); }
-        .btn-primary { background: var(--btn-primary-bg); border-color: var(--btn-primary-bg); color: var(--btn-primary-text); }
-        .btn-danger { background: var(--btn-danger-bg); border-color: var(--btn-danger-text); color: var(--btn-danger-text); }
-        .btn-secondary { background: var(--btn-default-bg); border: 1px solid var(--btn-default-border); }
-        .nav-btn {
-    font-size: 1.3rem;       /* чуть увеличим для лучшего вида */
-    min-width: 48px;
-    height: 44px;            /* фиксированная высота */
-    padding: 0;              /* убираем отступы, чтобы центровка была точной */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    box-sizing: border-box;
-}
-        .draft-badge {
-            background: #ff9800;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 12px;
-            margin-left: 8px;
-        }
-        details {
-            background: var(--bg-card);
-            border-radius: 24px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .app-header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), #6c5ce7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin: 0;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
         }
-        details.hidden-group { display: none; }
-        summary {
-            padding: 14px 18px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            background: var(--bg-card);
+        /* На главном экране заголовок крупнее */
+        .welcome-header .app-header h1 {
+            font-size: 1.6rem;
+        }
+        .icon-btn {
+            background: var(--surface);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 30px;
+            font-size: 1.3rem;
             cursor: pointer;
-            list-style: none;
-            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
         }
-        summary::-webkit-details-marker { display: none; }
-        summary::after { content: "▼"; float: right; color: var(--text-secondary); }
-        details[open] summary::after { transform: rotate(180deg); }
-        .group-content { padding: 16px; }
-        .chip-bar {
+        .icon-btn:active { transform: scale(0.94); background: var(--surface-2); }
+        .card { background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; transition: var(--transition); }
+        .btn { border: none; background: var(--surface-2); padding: 10px 16px; border-radius: var(--radius-btn); font-size: 0.95rem; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(30,136,229,0.3); }
+        .btn-primary:active { background: var(--primary-dark); transform: scale(0.96); }
+        .btn-danger { background: var(--danger-bg); color: var(--danger); }
+        .btn-danger:active { background: #ffcdd2; transform: scale(0.96); }
+        .btn:active { transform: scale(0.96); }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--border-light);
-            padding-bottom: 12px;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 6px 16px 18px;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+            border-top: 1px solid var(--border);
+            z-index: 100;
         }
-        .chip {
-            background: var(--chip-bg);
-            border-radius: 40px;
-            padding: 6px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: 0.1s;
-        }
-        .chip.active {
-            background: var(--chip-active-bg);
-            color: var(--chip-active-text);
-        }
-        .color-list {
+        .nav-item {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-        .color-row {
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .color-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 110px;
-        }
-        .color-icon { font-size: 26px; }
-        .color-name { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
-        .counter {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--counter-bg);
-            border-radius: 40px;
-            padding: 4px 8px;
-        }
-        .counter button {
-            background: transparent;
+            background: none;
             border: none;
-            font-size: 22px;
-            width: 38px;
-            height: 38px;
-            padding: 0;
-        }
-       .counter input {
-        width: 60px;
-        height: 36px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: 500;
-        border: 1px solid var(--input-border);
-        border-radius: 30px;
-        padding: 0;
-        background: var(--input-bg);
-        color: var(--text-primary);
-        font-family: monospace;
-        line-height: 1;
-        /* Убираем стандартные стрелки (спиннер) */
-        -moz-appearance: textfield;
-        appearance: textfield;
-        }
-
-        /* Для Chrome, Safari, Edge, Opera */
-        .counter input::-webkit-outer-spin-button,
-        .counter input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-        }
-        .preview-box {
-            background: var(--preview-bg);
-            color: var(--preview-text);
-            padding: 16px;
-            border-radius: 24px;
-            font-family: monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            margin: 20px 0;
-            max-height: 60vh;
-            overflow: auto;
-        }
-        .history-item {
-            background: var(--history-item-bg);
-            border-radius: 20px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-light);
-            overflow: hidden;
-        }
-        .history-header {
-            padding: 12px 16px;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            gap: 3px;
             cursor: pointer;
-            display: flex;
-            justify-content: space-between;
+            transition: var(--transition);
+            padding: 4px 12px;
+            border-radius: 30px;
         }
-        .history-date { font-size: 14px; color: var(--text-secondary); }
-        .history-expand-icon { font-size: 14px; color: var(--text-secondary); transition: transform 0.2s; display: inline-block; }
-        .history-item.open .history-expand-icon { transform: rotate(180deg); }
-        .history-preview {
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            max-height: 80px;
-            overflow: hidden;
-            padding: 0 16px 12px;
-            border-top: 1px solid var(--border-light);
-        }
-        .history-full {
-            display: none;
-            padding: 12px 16px;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-light);
-            max-height: 300px;
-            overflow: auto;
-        }
-        .history-item.open .history-full { display: block; }
-        .history-item.open .history-preview { display: none; }
-        .history-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            padding: 8px 16px 12px;
-            border-top: 1px solid var(--border-light);
-        }
-        .install-banner {
-            background: var(--btn-primary-bg);
-            color: white;
-            text-align: center;
-            padding: 10px;
-            border-radius: 40px;
-            margin-bottom: 16px;
-            cursor: pointer;
-        }
-        .action-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--toast-bg); color: var(--toast-text); padding: 10px 20px;
-            border-radius: 40px; font-size: 14px; z-index: 1000; white-space: nowrap;
-            pointer-events: none; opacity: 0; transition: opacity 0.2s;
-        }
-        @media (max-width: 550px) {
-            .color-row { flex-direction: column; align-items: flex-start; }
-            .counter { align-self: flex-end; }
-            .toolbar { flex-direction: column; }
-            .toolbar button { width: 100%; }
-        }
+        .nav-item.active { color: var(--primary); background: var(--surface-2); }
+        .nav-item span:first-child { font-size: 1.3rem; }
+        .nav-item:active { transform: scale(0.92); }
+        .search-wrapper { position: relative; margin-bottom: 16px; }
+        .search-wrapper input { width: 100%; padding: 12px 48px 12px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 44px; font-size: 0.95rem; color: var(--text-primary); outline: none; transition: var(--transition); }
+        .search-wrapper input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,136,229,0.2); }
+        .search-clear { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-tertiary); display: none; }
+        .groups-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 12px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+        .groups-chips { display: inline-flex; gap: 8px; padding: 2px 0; }
+        .group-chip { background: var(--surface-2); padding: 6px 18px; border-radius: 40px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease, transform 0.1s ease; display: inline-block; }
+        .group-chip.active { background: var(--primary); color: white; }
+        .group-chip:active { transform: scale(0.94); }
+        .group-card { background: var(--surface); border-radius: 24px; padding: 16px; box-shadow: var(--shadow-sm); margin-bottom: 16px; transition: box-shadow 0.2s; }
+        .group-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: var(--text-primary); }
+        .chip-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 10px; }
+        .chip { background: var(--surface-2); padding: 6px 14px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease; }
+        .chip.active { background: var(--primary); color: white; }
+        .chip:active { transform: scale(0.94); }
+        .color-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; transition: opacity 0.15s ease, transform 0.15s ease; }
+        .color-list.fade-out { opacity: 0; transform: translateY(4px); }
+        .color-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); padding: 8px 12px; border-radius: 20px; transition: all 0.1s ease; }
+        .color-info { display: flex; align-items: center; gap: 8px; }
+        .color-icon { font-size: 22px; }
+        .color-name { font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); }
+        .counter { display: flex; align-items: center; gap: 4px; background: var(--surface); border-radius: 28px; padding: 2px; }
+        .counter button { background: var(--surface-2); border: none; width: 30px; height: 30px; border-radius: 26px; font-size: 1.1rem; font-weight: bold; cursor: pointer; color: var(--text-primary); transition: var(--transition); }
+        .counter button:active { background: var(--border); transform: scale(0.92); }
+        .counter input { width: 40px; text-align: center; font-size: 0.9rem; font-weight: 500; background: transparent; border: none; color: var(--text-primary); font-family: monospace; outline: none; }
+        .counter input::-webkit-outer-spin-button, .counter input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .counter input[type=number] { -moz-appearance: textfield; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--overlay-bg); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 200; visibility: hidden; opacity: 0; transition: opacity 0.2s, visibility 0.2s; padding: 20px; }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-content { background: var(--surface); border-radius: 28px; max-width: 500px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-md); animation: modalPop 0.2s ease; }
+        @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .modal-header h3 { font-size: 1.2rem; font-weight: 600; margin: 0; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-tertiary); padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 20px; transition: var(--transition); }
+        .modal-close:active { background: var(--surface-2); transform: scale(0.94); }
+        .modal-body { padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4; background: var(--surface-2); margin: 14px; border-radius: 20px; max-height: 50vh; overflow: auto; }
+        .modal-footer { padding: 10px 18px 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .modal-footer .btn { flex: 1; min-width: 100px; text-align: center; white-space: nowrap; }
+        .history-item { background: var(--surface); border-radius: 20px; margin-bottom: 10px; padding: 14px; box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); display: flex; justify-content: space-between; align-items: center; }
+        .history-item:active { transform: scale(0.98); background: var(--surface-2); }
+        .history-date { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
+        .history-preview { font-family: monospace; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        .history-right { text-align: right; }
+        .history-chevron { font-size: 1.1rem; color: var(--text-tertiary); }
+        .toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-page); padding: 8px 18px; border-radius: 40px; font-size: 0.8rem; z-index: 210; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; box-shadow: var(--shadow-md); }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-tertiary); }
+        @media (max-width: 480px) { .app-header h1 { font-size: 1rem; } .welcome-header .app-header h1 { font-size: 1.3rem; } }
     </style>
 </head>
 <body>
-<div class="container">
-    <div id="installBanner" class="install-banner" style="display: none;">📲 Установить приложение</div>
-    <div id="toast" class="toast"></div>
-
-    <!-- ПРИВЕТСТВИЕ -->
+<div id="toast" class="toast"></div>
+<div class="app-container">
+    <!-- ЭКРАН ПРИВЕТСТВИЯ -->
     <div id="welcomeScreen" class="screen active">
-        <div class="header-row">
-            <div class="header-left"></div>
-            <div class="header-center">
-                <h1>📱 СкладРасклад</h1>
-                <span id="draftBadge" class="draft-badge" style="display: none;">📝 Черновик</span>
-            </div>
-            <div class="header-right"><button id="welcomeThemeToggle" class="nav-btn">🌙</button></div>
+        <div class="app-header welcome-header">
+            <div></div>
+            <h1>СкладРасклад</h1>
+            <button id="welcomeThemeToggle" class="icon-btn">🌙</button>
         </div>
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 20px; margin-top: -40px;">
-            <p>Создаватель склад-расклада :D</p>
-            <button id="newFromWelcomeBtn" class="btn-primary" style="font-size: 1.2rem; padding: 12px 24px; width: 80%; max-width: 280px;">✨ Новый склад-расклад</button>
-            <button id="historyFromWelcomeBtn" class="btn-secondary" style="font-size: 1.2rem; padding: 12px 24px; width: 80%; max-width: 280px;">📜 История</button>
+        <div class="card" style="text-align: center; padding: 32px 20px;">
+            <img src="./icon-256.png" alt="logo" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 16px;">
+            <p style="margin: 16px 0 24px; color: var(--text-secondary); font-size: 1rem;">Создаватель склад-расклада :D</p>
+            <button id="newFromWelcomeBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">✨ Новый склад-расклад</button>
+            <button id="draftFromWelcomeBtn" class="btn" style="width: 100%; margin-bottom: 12px; display: none;">📝 Черновик</button>
+            <button id="historyFromWelcomeBtn" class="btn" style="width: 100%;">📜 История</button>
         </div>
-        <footer style="text-align: center; font-size: 12px; margin-top: 30px;">Первая в истории конторы приблуда для упрощения еженедельной рутины. Навайбкодил с любовью</footer>
+        <footer style="text-align: center; font-size: 12px; margin-top: 24px;">
+            Первая в истории конторы приблуда для<br>
+            упрощения еженедельной рутины.<br>
+            Навайбкодил с любовью<br>
+            ❤️
+        </footer>
     </div>
 
-    <!-- РЕДАКТОР -->
+    <!-- ЭКРАН РЕДАКТОРА -->
     <div id="editorScreen" class="screen">
-        <div class="header-row">
-            <div class="header-left"><button id="backToWelcomeFromEditor" class="nav-btn btn-secondary">←</button></div>
-            <div class="header-center"><h1>СкладРасклад</h1></div>
-            <div class="header-right"><button id="editorThemeToggle" class="nav-btn">🌙</button></div>
+        <div class="app-header">
+            <button id="editorBackBtn" class="icon-btn">←</button>
+            <h1 id="editorTitle">Редактор</h1>
+            <button id="editorThemeToggle" class="icon-btn">🌙</button>
         </div>
-        <div class="toolbar">
-            <button id="resetBtn" class="btn-danger">✨ Обнулить всё</button>
-            <button id="finishBtn" class="btn-primary">✅ Завершить</button>
-        </div>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="🔍 Поиск модели">
-        </div>
-        <div id="modelsContainer"></div>
+        <div style="display: flex; gap: 10px; margin-bottom: 14px;"><button id="resetBtn" class="btn btn-danger" style="flex:1">Обнулить всё</button><button id="finishBtn" class="btn btn-primary" style="flex:1">Завершить</button></div>
+        <div class="search-wrapper"><input type="text" id="searchInput" placeholder="Поиск модели..."><button id="searchClearBtn" class="search-clear">✕</button></div>
+        <div class="groups-scroll" id="groupsScroll"><div class="groups-chips" id="groupsChips"></div></div>
+        <div id="selectedGroupCard" class="group-card"><div class="group-title" id="groupTitle"></div><div class="chip-bar" id="variantsChips"></div><div id="colorsList" class="color-list"></div></div>
     </div>
 
-    <!-- ПРЕВЬЮ -->
-    <div id="previewScreen" class="screen">
-        <div class="header-row">
-            <div class="header-left"><button id="backToEditorFromPreview" class="nav-btn btn-secondary">←</button></div>
-            <div class="header-center"><h1>Превью</h1></div>
-            <div class="header-right"><button id="previewThemeToggle" class="nav-btn">🌙</button></div>
-        </div>
-        <div id="previewMessage" class="preview-box"></div>
-        <div class="action-buttons">
-            <button id="copyAndFinishBtn" class="btn-primary">📋 Скопировать и завершить</button>
-            <button id="homeFromPreview" class="btn-secondary">🏠 Домой</button>
-        </div>
-    </div>
-
-    <!-- ИСТОРИЯ -->
+    <!-- ЭКРАН ИСТОРИИ -->
     <div id="historyScreen" class="screen">
-        <div class="header-row">
-            <div class="header-left"><button id="backToWelcomeFromHistory" class="nav-btn btn-secondary">←</button></div>
-            <div class="header-center"><h1>История</h1></div>
-            <div class="header-right"><button id="historyThemeToggle" class="nav-btn">🌙</button></div>
+        <div class="app-header">
+            <button id="historyBackBtn" class="icon-btn">←</button>
+            <h1>История</h1>
+            <button id="historyThemeToggle" class="icon-btn">🌙</button>
         </div>
-        <button id="clearHistoryBtn" class="btn-danger" style="display: block; margin: 0 auto 16px auto; max-width: 280px; width: 90%;">🗑 Очистить всю историю</button>
-        <div id="historyList"></div>
-        <div id="historyEmptyMsg" style="text-align: center; margin-top: 40px;">Здесь ничего нет. Сделай склад-расклад и нажми «Завершить»</div>
+        <button id="clearHistoryBtn" class="btn btn-danger" style="width: 100%; margin-bottom: 16px;">🗑 Очистить всю историю</button>
+        <div id="historyList"></div><div id="historyEmptyMsg" class="empty-state">Здесь ничего нет. Сделай склад-расклад и нажми «Завершить»</div>
     </div>
 </div>
 
+<div class="bottom-nav">
+    <button class="nav-item" data-screen="welcome"><span>🏠</span><span>Главная</span></button>
+    <button class="nav-item" data-screen="editor"><span>✏️</span><span>Редактор</span></button>
+    <button class="nav-item" data-screen="history"><span>📜</span><span>История</span></button>
+</div>
+
+<div id="previewModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>📄 Превью</h3><button class="modal-close" id="previewModalCloseBtn">&times;</button></div><div class="modal-body" id="modalPreviewMessage"></div><div class="modal-footer"><button id="modalCopyFinishBtn" class="btn btn-primary">📋 Скопировать и завершить</button></div></div></div>
+<div id="historyModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3 id="historyModalTitle"></h3><button class="modal-close" id="historyModalCloseBtn">&times;</button></div><div class="modal-body" id="historyModalMessage"></div><div class="modal-footer"><button id="historyModalCopyBtn" class="btn btn-primary">Копировать</button><button id="historyModalEditBtn" class="btn">Редактировать</button><button id="historyModalDeleteBtn" class="btn btn-danger">Удалить</button></div></div></div>
+
 <script>
 (function(){
-    // ---------- ГРУППЫ МОДЕЛЕЙ ----------
     const GROUPS = [
-        { name: "X", variants: ["64", "256"] },
-        { name: "XS", variants: ["64", "256", "512"] },
-        { name: "XS Max", variants: ["64", "256", "512"] },
-        { name: "XR", variants: ["64", "128", "256"] },
-        { name: "11", variants: ["64", "128", "256"] },
-        { name: "11 Pro", variants: ["64", "256", "512"] },
-        { name: "11 Pro Max", variants: ["64", "256", "512"] },
-        { name: "12 Mini", variants: ["64", "128", "256"] },
-        { name: "12", variants: ["64", "128", "256"] },
-        { name: "12 Pro", variants: ["128", "256", "512"] },
-        { name: "12 Pro Max", variants: ["128", "256", "512"] },
-        { name: "13 Mini", variants: ["128", "256", "512"] },
-        { name: "13", variants: ["128", "256", "512"] },
-        { name: "13 Pro", variants: ["128", "256", "512", "1TB"] },
-        { name: "13 Pro Max", variants: ["128", "256", "512", "1TB"] },
-        { name: "14", variants: ["128", "256", "512"] },
-        { name: "14 Plus", variants: ["128", "256", "512"] },
-        { name: "14 Pro", variants: ["128", "256", "512", "1TB"] },
-        { name: "14 Pro Max", variants: ["128", "256", "512", "1TB"] },
-        { name: "15", variants: ["128", "256", "512"] },
-        { name: "15 Plus", variants: ["128", "256", "512"] },
-        { name: "15 Pro", variants: ["128", "256", "512", "1TB"] },
-        { name: "15 Pro Max", variants: ["256", "512", "1TB"] },
-        { name: "16", variants: ["128", "256", "512"] },
-        { name: "16 Plus", variants: ["128", "256", "512"] },
-        { name: "16 Pro", variants: ["128", "256", "512", "1TB"] },
-        { name: "16 Pro Max", variants: ["256", "512", "1TB"] }
+        { name: "X", variants: ["64","256"] }, { name: "XS", variants: ["64","256","512"] }, { name: "XS Max", variants: ["64","256","512"] },
+        { name: "XR", variants: ["64","128","256"] }, { name: "11", variants: ["64","128","256"] }, { name: "11 Pro", variants: ["64","256","512"] },
+        { name: "11 Pro Max", variants: ["64","256","512"] }, { name: "12 Mini", variants: ["64","128","256"] }, { name: "12", variants: ["64","128","256"] },
+        { name: "12 Pro", variants: ["128","256","512"] }, { name: "12 Pro Max", variants: ["128","256","512"] }, { name: "13 Mini", variants: ["128","256","512"] },
+        { name: "13", variants: ["128","256","512"] }, { name: "13 Pro", variants: ["128","256","512","1TB"] }, { name: "13 Pro Max", variants: ["128","256","512","1TB"] },
+        { name: "14", variants: ["128","256","512"] }, { name: "14 Plus", variants: ["128","256","512"] }, { name: "14 Pro", variants: ["128","256","512","1TB"] },
+        { name: "14 Pro Max", variants: ["128","256","512","1TB"] }, { name: "15", variants: ["128","256","512"] }, { name: "15 Plus", variants: ["128","256","512"] },
+        { name: "15 Pro", variants: ["128","256","512","1TB"] }, { name: "15 Pro Max", variants: ["256","512","1TB"] }, { name: "16", variants: ["128","256","512"] },
+        { name: "16 Plus", variants: ["128","256","512"] }, { name: "16 Pro", variants: ["128","256","512","1TB"] }, { name: "16 Pro Max", variants: ["256","512","1TB"] }
     ];
 
-    const colorNames = {
-        "🖤": "чёрный",
-        "🤍": "белый",
-        "💛": "жёлтый / золотой / пустынный титан",
-        "🧡": "коралловый",
-        "💚": "зелёный",
-        "💙": "синий",
-        "💜": "фиолетовый",
-        "❤️": "красный",
-        "🩷": "розовый",
-        "🩶": "титан"
-    };
-
-    function getColorsForFullModel(fullModel) {
-        if (fullModel.startsWith("X ")) return ["🖤", "🤍"];
-        if (fullModel.includes("XS")) return ["🖤", "🤍", "💛"];
-        if (fullModel.includes("XR")) return ["🖤", "🤍", "💙", "💛", "🧡", "❤️"];
-        if (fullModel.startsWith("11 ") && !fullModel.includes("Pro")) return ["🖤", "🤍", "💚", "💛", "❤️", "💜"];
-        if (fullModel.includes("11 Pro")) return ["🖤", "🤍", "💚", "💛"];
-        if (fullModel.includes("12 Mini") || fullModel === "12 64" || fullModel === "12 128" || fullModel === "12 256")
-            return ["🖤", "🤍", "💚", "💙", "❤️", "💜"];
-        if (fullModel.includes("12 Pro") && !fullModel.includes("Max")) return ["🖤", "🤍", "💛", "💙"];
-        if (fullModel.includes("12 Pro Max")) return ["🖤", "🤍", "💛", "💙"];
-        if (fullModel.includes("13 Mini")) return ["🖤", "🤍", "💙", "🩷", "💚", "❤️"];
-        if (fullModel.startsWith("13 ") && !fullModel.includes("Pro")) return ["🖤", "🤍", "💙", "🩷", "💚", "❤️"];
-        if (fullModel.includes("13 Pro")) return ["🖤", "🤍", "💙", "💛", "💚"];
-        if (fullModel.includes("14 Plus")) return ["🖤", "🤍", "💙", "💜", "💛"];
-        if (fullModel.includes("14 Pro")) return ["🖤", "🤍", "💜", "💛"];
-        if (fullModel.startsWith("14 ") && !fullModel.includes("Plus") && !fullModel.includes("Pro"))
-            return ["🖤", "🤍", "💙", "💜", "❤️", "💛"];
-        if ((fullModel.startsWith("15 ") && !fullModel.includes("Pro")) || fullModel.includes("15 Plus"))
-            return ["🖤", "💙", "💚", "🩷", "💛"];
-        if (fullModel.includes("15 Pro")) return ["🖤", "🤍", "💙", "🩶"];
-        if ((fullModel.startsWith("16 ") && !fullModel.includes("Pro")) || fullModel.includes("16 Plus"))
-            return ["🖤", "🤍", "💙", "🩷", "💚"];
-        if (fullModel.includes("16 Pro")) return ["🖤", "🤍", "🩶", "💛"];
-        return ["🖤", "🤍", "💛", "💚", "💙", "❤️", "🩷"];
+    function getColors(modelName) {
+        let colors;
+        if (modelName.startsWith("X ")) colors = ["🖤","🤍"];
+        else if (modelName.includes("XS")) colors = ["🖤","🤍","💛"];
+        else if (modelName.includes("XR")) colors = ["🖤","🤍","💙","💛","🧡","❤️"];
+        else if (modelName.startsWith("11 ") && !modelName.includes("Pro")) colors = ["🖤","🤍","💚","💛","❤️","💜"];
+        else if (modelName.includes("11 Pro")) colors = ["🖤","🤍","💚","💛"];
+        else if (modelName.includes("12 Mini") || modelName === "12 64" || modelName === "12 128" || modelName === "12 256") colors = ["🖤","🤍","💚","💙","❤️","💜"];
+        else if (modelName.includes("12 Pro") && !modelName.includes("Max")) colors = ["🖤","🤍","💛","💙"];
+        else if (modelName.includes("12 Pro Max")) colors = ["🖤","🤍","💛","💙"];
+        else if (modelName.includes("13 Mini")) colors = ["🖤","🤍","💙","🩷","💚","❤️"];
+        else if (modelName.startsWith("13 ") && !modelName.includes("Pro")) colors = ["🖤","🤍","💙","🩷","💚","❤️"];
+        else if (modelName.includes("13 Pro")) colors = ["🖤","🤍","💙","💛","💚"];
+        else if (modelName.includes("14 Plus")) colors = ["🖤","🤍","💙","💜","💛"];
+        else if (modelName.includes("14 Pro")) colors = ["🖤","🤍","💜","💛"];
+        else if (modelName.startsWith("14 ") && !modelName.includes("Plus") && !modelName.includes("Pro")) colors = ["🖤","🤍","💙","💜","❤️","💛"];
+        else if ((modelName.startsWith("15 ") && !modelName.includes("Pro")) || modelName.includes("15 Plus")) colors = ["🖤","💙","💚","🩷","💛"];
+        else if (modelName.includes("15 Pro")) colors = ["🖤","🤍","💙","🩶"];
+        else if ((modelName.startsWith("16 ") && !modelName.includes("Pro")) || modelName.includes("16 Plus")) colors = ["🖤","🤍","💙","🩷","💚"];
+        else if (modelName.includes("16 Pro")) colors = ["🖤","🤍","🩶","💛"];
+        else colors = ["🖤","🤍","💛","💚","💙","❤️","🩷"];
+        
+        const hasRed = colors.includes("❤️");
+        const hasYellow = colors.includes("💛");
+        if (hasRed) colors = colors.filter(c => c !== "❤️");
+        if (hasYellow) colors = colors.filter(c => c !== "💛");
+        if (hasRed) colors.push("❤️");
+        if (hasYellow) colors.push("💛");
+        return colors;
     }
 
-    // ---------- ДАННЫЕ ----------
-    let stock = {};
-    let history = [];
-    let searchTerm = "";
-    let openGroups = new Set();
-    let selectedVariant = {};
-
-    const STORAGE_CURRENT = "sklad_grouped";
-    const STORAGE_HISTORY = "sklad_history";
-
-    function hasNonZeroStock() {
-        for (let group of GROUPS) {
-            for (let v of group.variants) {
-                const colors = getColorsForFullModel(`${group.name} ${v}`);
-                for (let c of colors) {
-                    if ((stock[group.name]?.[v]?.[c] || 0) > 0) return true;
-                }
-            }
+    function getColorName(color, modelName) {
+        if (color !== "💛") {
+            const staticNames = { "🖤":"чёрный","🤍":"белый","🧡":"коралловый","💚":"зелёный","💙":"синий","💜":"фиолетовый","❤️":"красный","🩷":"розовый","🩶":"титан" };
+            return staticNames[color] || color;
         }
-        return false;
+        const isXS = modelName.includes("XS");
+        const isPro = modelName.includes("Pro");
+        const is16Pro = modelName.includes("16 Pro");
+        if (is16Pro) return "пустынный";
+        if (isXS || isPro) return "золотой";
+        return "жёлтый";
     }
 
-    function initStock() {
-        const empty = {};
-        for (let group of GROUPS) {
-            empty[group.name] = {};
-            for (let v of group.variants) {
-                const fullModel = `${group.name} ${v}`;
-                const colors = getColorsForFullModel(fullModel);
-                empty[group.name][v] = {};
-                for (let c of colors) empty[group.name][v][c] = 0;
-            }
-        }
-        return empty;
-    }
+    let stock = {}, savedHistory = [], searchTerm = "", selectedGroup = GROUPS[0].name, selectedVariant = {}, hasDraft = false, searchDebounce;
+    let currentEditDate = null;
+    const STORAGE_CURRENT = "sklad_grouped", STORAGE_HISTORY = "sklad_history", STORAGE_SELECTED_GROUP = "sklad_selected_group";
 
+    function initStock() { let st = {}; for (let g of GROUPS) { st[g.name] = {}; for (let v of g.variants) { st[g.name][v] = {}; let cols = getColors(`${g.name} ${v}`); for (let c of cols) st[g.name][v][c] = 0; } } return st; }
     function loadData() {
-        const saved = localStorage.getItem(STORAGE_CURRENT);
-        if (saved) {
-            try {
-                stock = JSON.parse(saved);
-                for (let group of GROUPS) {
-                    if (!stock[group.name]) stock[group.name] = {};
-                    for (let v of group.variants) {
-                        if (!stock[group.name][v]) stock[group.name][v] = {};
-                        const fullModel = `${group.name} ${v}`;
-                        const colors = getColorsForFullModel(fullModel);
-                        for (let c of colors) {
-                            if (stock[group.name][v][c] === undefined) stock[group.name][v][c] = 0;
-                        }
-                    }
-                }
-            } catch(e) { stock = initStock(); }
-        } else {
-            stock = initStock();
-        }
-        const savedHist = localStorage.getItem(STORAGE_HISTORY);
-        if (savedHist) try { history = JSON.parse(savedHist); } catch(e) { history = []; }
-        if (!Array.isArray(history)) history = [];
-        for (let g of GROUPS) {
-            if (selectedVariant[g.name] === undefined) selectedVariant[g.name] = g.variants[0];
-        }
+        let saved = localStorage.getItem(STORAGE_CURRENT); if (saved) try { stock = JSON.parse(saved); } catch(e) { stock = initStock(); } else stock = initStock();
+        for (let g of GROUPS) { if (!stock[g.name]) stock[g.name] = {}; for (let v of g.variants) { if (!stock[g.name][v]) stock[g.name][v] = {}; let cols = getColors(`${g.name} ${v}`); for (let c of cols) if (stock[g.name][v][c] === undefined) stock[g.name][v][c] = 0; } }
+        let savedHist = localStorage.getItem(STORAGE_HISTORY); if (savedHist) try { savedHistory = JSON.parse(savedHist); } catch(e) { savedHistory = []; } if (!Array.isArray(savedHistory)) savedHistory = [];
+        let savedGroup = localStorage.getItem(STORAGE_SELECTED_GROUP); if (savedGroup && GROUPS.some(g => g.name === savedGroup)) selectedGroup = savedGroup; else selectedGroup = GROUPS[0].name;
+        for (let g of GROUPS) if (!selectedVariant[g.name]) selectedVariant[g.name] = g.variants[0];
+        checkDraft();
+        setEditorDateFromNow();
     }
-
     function saveCurrent() { localStorage.setItem(STORAGE_CURRENT, JSON.stringify(stock)); }
-    function saveHistory() { if (history.length > 50) history = history.slice(0,50); localStorage.setItem(STORAGE_HISTORY, JSON.stringify(history)); }
-
+    function saveHistory() { if (savedHistory.length>50) savedHistory=savedHistory.slice(0,50); localStorage.setItem(STORAGE_HISTORY, JSON.stringify(savedHistory)); }
+    function saveSelectedGroup() { localStorage.setItem(STORAGE_SELECTED_GROUP, selectedGroup); }
+    function checkDraft() { for (let g of GROUPS) for (let v of g.variants) for (let c of getColors(`${g.name} ${v}`)) if ((stock[g.name]?.[v]?.[c]||0) !== 0) { hasDraft = true; return; } hasDraft = false; }
+    function setDraft() { if (!hasDraft) { hasDraft=true; let btn=document.getElementById("draftFromWelcomeBtn"); if(btn) btn.style.display="flex"; } }
+    function clearDraft() { hasDraft=false; let btn=document.getElementById("draftFromWelcomeBtn"); if(btn) btn.style.display="none"; }
+    
+    function formatDate(date) { let d = new Date(date); return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`; }
+    function setEditorDateFromNow() { currentEditDate = new Date(); updateEditorTitle(); }
+    function setEditorDateFromHistory(dateStr) { currentEditDate = new Date(dateStr); updateEditorTitle(); }
+    function updateEditorTitle() { const titleElem = document.getElementById("editorTitle"); if (titleElem && currentEditDate) { titleElem.textContent = `Склад-расклад от ${formatDate(currentEditDate)}`; } }
+    
     function resetAll() {
-        for (let group of GROUPS) {
-            for (let v of group.variants) {
-                const fullModel = `${group.name} ${v}`;
-                const colors = getColorsForFullModel(fullModel);
-                for (let c of colors) stock[group.name][v][c] = 0;
-            }
-        }
-        saveCurrent();
-        renderEditor();
-        updateDraftBadge();
+        for (let g of GROUPS) for (let v of g.variants) for (let c of getColors(`${g.name} ${v}`)) stock[g.name][v][c] = 0;
+        saveCurrent(); clearDraft(); selectedGroup = GROUPS[0].name; saveSelectedGroup(); for (let g of GROUPS) selectedVariant[g.name] = g.variants[0];
+        setEditorDateFromNow();
+        if (document.getElementById("editorScreen").classList.contains("active")) { renderGroupsChips(); renderGroupContent(); }
+    }
+    function generateMessage() { let lines = []; for (let g of GROUPS) { for (let v of g.variants) { let parts = []; for (let c of getColors(`${g.name} ${v}`)) { let cnt = stock[g.name]?.[v]?.[c] || 0; if (cnt > 0) parts.push(`${cnt}${c}`); } if (parts.length) lines.push(`${g.name} ${v} - ${parts.join(" ")}`); } } return lines.join("\n") || "(пусто)"; }
+    function saveToHistory() { let msg = generateMessage(); let copy = JSON.parse(JSON.stringify(stock)); savedHistory.unshift({ id: Date.now(), date: new Date().toISOString(), stock: copy, fullMessage: msg }); if (savedHistory.length>50) savedHistory.pop(); saveHistory(); clearDraft(); }
+    function updateStock(group, variant, color, val) { stock[group][variant][color] = val; saveCurrent(); setDraft(); renderGroupContent(); }
+
+    function scrollToActiveGroupChip() { 
+        const activeChip = document.querySelector(".group-chip.active");
+        if (activeChip) activeChip.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
     }
 
-    function generateMessageFromStock() {
-        let lines = [];
-        for (let group of GROUPS) {
-            for (let v of group.variants) {
-                const parts = [];
-                const colors = getColorsForFullModel(`${group.name} ${v}`);
-                for (let c of colors) {
-                    let val = stock[group.name]?.[v]?.[c] || 0;
-                    if (val > 0) parts.push(`${val}${c}`);
-                }
-                if (parts.length) lines.push(`${group.name} ${v} - ${parts.join(" ")}`);
-            }
-        }
-        return lines.join("\n");
-    }
-
-    function saveToHistory() {
-        const msg = generateMessageFromStock();
-        const copy = JSON.parse(JSON.stringify(stock));
-        history.unshift({
-            id: Date.now(),
-            date: new Date().toISOString(),
-            stock: copy,
-            fullMessage: msg
-        });
-        if (history.length > 50) history.pop();
-        saveHistory();
-        resetAll();  // очищаем черновик после сохранения
-        updateDraftBadge();
-    }
-
-    function blurActive() {
-        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    }
-
-    // ---------- ОТРИСОВКА РЕДАКТОРА ----------
-    function renderEditor() {
-        blurActive();
-        const container = document.getElementById("modelsContainer");
+    let groupsChipsContainer = null;
+    
+    function renderGroupsChips() {
+        const container = document.getElementById("groupsChips");
         if (!container) return;
-
-        const currentOpen = new Set();
-        document.querySelectorAll("#modelsContainer details[open]").forEach(d => {
-            const summary = d.querySelector("summary");
-            if (summary) currentOpen.add(summary.innerText.trim());
-        });
-        openGroups = currentOpen;
-
+        groupsChipsContainer = container;
+        let filteredGroups = GROUPS;
+        if (searchTerm) filteredGroups = GROUPS.filter(g => g.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        
         container.innerHTML = "";
-        let anyVisible = false;
-        for (let group of GROUPS) {
-            const match = searchTerm === "" || group.name.toLowerCase().includes(searchTerm.toLowerCase());
-            if (match) anyVisible = true;
-            const details = document.createElement("details");
-            details.className = match ? "" : "hidden-group";
-            if (openGroups.has(group.name)) details.open = true;
-            const summary = document.createElement("summary");
-            summary.innerText = group.name;
-            details.appendChild(summary);
+        for (let g of filteredGroups) { 
+            let chip = document.createElement("div"); 
+            chip.className = "group-chip"; 
+            if (selectedGroup === g.name) chip.classList.add("active"); 
+            chip.textContent = g.name; 
+            chip.onclick = (e) => {
+                e.stopPropagation();
+                if (selectedGroup === g.name) return;
+                for (let child of container.children) child.classList.remove("active");
+                chip.classList.add("active");
+                selectedGroup = g.name;
+                saveSelectedGroup();
+                renderGroupContent();
+                scrollToActiveGroupChip();
+            };
+            container.appendChild(chip); 
+        }
+        if (filteredGroups.length === 0) { 
+            let emptyDiv = document.createElement("div"); 
+            emptyDiv.textContent = "😕 Модели не найдены"; 
+            emptyDiv.style.padding = "10px"; 
+            emptyDiv.style.color = "var(--text-tertiary)"; 
+            container.appendChild(emptyDiv); 
+        }
+        scrollToActiveGroupChip();
+    }
 
-            const groupDiv = document.createElement("div");
-            groupDiv.className = "group-content";
-
-            const chipBar = document.createElement("div");
-            chipBar.className = "chip-bar";
-            for (let v of group.variants) {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                if (selectedVariant[group.name] === v) chip.classList.add("active");
-                chip.innerText = v;
-                chip.onclick = (e) => {
-                    e.stopPropagation();
-                    blurActive();
-                    selectedVariant[group.name] = v;
-                    renderEditor();
-                };
-                chipBar.appendChild(chip);
-            }
-            groupDiv.appendChild(chipBar);
-
+    let animationTimer = null;
+    function renderGroupContent() {
+        const group = GROUPS.find(g => g.name === selectedGroup); if (!group) return;
+        const colorsContainer = document.getElementById("colorsList");
+        if (!colorsContainer) return;
+        
+        colorsContainer.classList.add("fade-out");
+        if (animationTimer) clearTimeout(animationTimer);
+        animationTimer = setTimeout(() => {
+            document.getElementById("groupTitle").textContent = group.name;
+            
+            const variantsContainer = document.getElementById("variantsChips");
             const currentVariant = selectedVariant[group.name] || group.variants[0];
-            const fullModel = `${group.name} ${currentVariant}`;
-            const colors = getColorsForFullModel(fullModel);
-            const colorList = document.createElement("div");
-            colorList.className = "color-list";
+            variantsContainer.innerHTML = "";
+            for (let v of group.variants) { 
+                let chip = document.createElement("div"); 
+                chip.className = "chip"; 
+                if (currentVariant === v) chip.classList.add("active"); 
+                chip.textContent = v; 
+                chip.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    if (selectedVariant[group.name] === v) return;
+                    for (let child of variantsContainer.children) child.classList.remove("active");
+                    chip.classList.add("active");
+                    selectedVariant[group.name] = v; 
+                    renderGroupContent(); 
+                }; 
+                variantsContainer.appendChild(chip); 
+            }
+            
+            const fullModelName = `${group.name} ${currentVariant}`; 
+            const colors = getColors(fullModelName);
+            colorsContainer.innerHTML = "";
             for (let col of colors) {
-                const val = stock[group.name][currentVariant][col] || 0;
-                const row = document.createElement("div");
-                row.className = "color-row";
-                const left = document.createElement("div");
-                left.className = "color-info";
-                left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${colorNames[col] || col}</span>`;
+                let val = stock[group.name][currentVariant][col] || 0;
+                let row = document.createElement("div"); row.className = "color-row";
+                let left = document.createElement("div"); left.className = "color-info"; 
+                left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${getColorName(col, fullModelName)}</span>`; 
                 row.appendChild(left);
-                const counter = document.createElement("div");
-                counter.className = "counter";
-                const btnMinus = document.createElement("button");
-                btnMinus.textContent = "−";
-                btnMinus.onclick = (e) => {
-                    e.preventDefault();
-                    blurActive();
-                    let newVal = (stock[group.name][currentVariant][col] || 0) - 1;
-                    if (newVal < 0) newVal = 0;
-                    stock[group.name][currentVariant][col] = newVal;
-                    saveCurrent();
-                    renderEditor();
-                };
-                const input = document.createElement("input");
-                input.type = "number";
-                input.value = val;
-                input.onchange = (e) => {
-                    let v = parseInt(e.target.value, 10);
-                    if (isNaN(v)) v = 0;
-                    if (v < 0) v = 0;
-                    stock[group.name][currentVariant][col] = v;
-                    saveCurrent();
-                    renderEditor();
-                };
-                const btnPlus = document.createElement("button");
-                btnPlus.textContent = "+";
-                btnPlus.onclick = (e) => {
-                    e.preventDefault();
-                    blurActive();
-                    let newVal = (stock[group.name][currentVariant][col] || 0) + 1;
-                    stock[group.name][currentVariant][col] = newVal;
-                    saveCurrent();
-                    renderEditor();
-                };
-                counter.appendChild(btnMinus);
-                counter.appendChild(input);
-                counter.appendChild(btnPlus);
-                row.appendChild(counter);
-                colorList.appendChild(row);
+                let counter = document.createElement("div"); counter.className = "counter";
+                let btnMinus = document.createElement("button"); btnMinus.textContent = "−"; 
+                btnMinus.onclick = (e) => { e.stopPropagation(); let newVal = Math.max(0, val-1); updateStock(group.name, currentVariant, col, newVal); };
+                let input = document.createElement("input"); input.type = "number"; input.value = val; 
+                input.onchange = (e) => { let vv = parseInt(e.target.value); if(isNaN(vv)) vv=0; if(vv<0) vv=0; updateStock(group.name, currentVariant, col, vv); };
+                let btnPlus = document.createElement("button"); btnPlus.textContent = "+"; 
+                btnPlus.onclick = (e) => { e.stopPropagation(); updateStock(group.name, currentVariant, col, val+1); };
+                counter.append(btnMinus, input, btnPlus); row.appendChild(counter); colorsContainer.appendChild(row);
             }
-            groupDiv.appendChild(colorList);
-            details.appendChild(groupDiv);
-            container.appendChild(details);
-        }
-        if (!anyVisible && searchTerm !== "") {
-            const msgDiv = document.createElement("div");
-            msgDiv.style.textAlign = "center";
-            msgDiv.style.padding = "20px";
-            msgDiv.innerText = "😕 Модели не найдены";
-            container.appendChild(msgDiv);
-        }
-        updateDraftBadge();
+            colorsContainer.classList.remove("fade-out");
+        }, 120);
     }
 
-    // ---------- ИСТОРИЯ С КНОПКОЙ УДАЛЕНИЯ ----------
-    function renderHistory() {
-        const container = document.getElementById("historyList");
-        const emptyMsg = document.getElementById("historyEmptyMsg");
-        if (!container) return;
-        if (history.length === 0) {
-            container.innerHTML = "";
-            emptyMsg.style.display = "block";
-            return;
-        }
-        emptyMsg.style.display = "none";
-        container.innerHTML = "";
-        for (let entry of history) {
-            const dateStr = new Date(entry.date).toLocaleString();
-            const full = entry.fullMessage;
-            const preview = full.split("\n").slice(0, 3).join("\n") + (full.split("\n").length > 3 ? "\n..." : "");
-            const div = document.createElement("div");
-            div.className = "history-item";
-            div.innerHTML = `
-                <div class="history-header">
-                    <div class="history-date">📅 ${escapeHtml(dateStr)}</div>
-                    <div class="history-expand-icon">▼</div>
-                </div>
-                <div class="history-preview">${escapeHtml(preview)}</div>
-                <div class="history-full">${escapeHtml(full)}</div>
-                <div class="history-actions">
-                    <button class="copy-history-btn" data-id="${entry.id}">📋 Копировать</button>
-                    <button class="edit-history-btn" data-id="${entry.id}">✏️ Редактировать</button>
-                    <button class="delete-history-btn" data-id="${entry.id}">🗑 Удалить</button>
-                </div>
-            `;
-            container.appendChild(div);
-            const header = div.querySelector(".history-header");
-            header.addEventListener("click", (e) => {
-                if (e.target.tagName === 'BUTTON') return;
-                div.classList.toggle("open");
-            });
-        }
-        document.querySelectorAll(".copy-history-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
-                const entry = history.find(h => h.id === id);
-                if (entry) copyToClipboard(entry.fullMessage, "Скопировано");
-            });
-        });
-        document.querySelectorAll(".edit-history-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
-                const entry = history.find(h => h.id === id);
-                if (entry) {
-                    stock = JSON.parse(JSON.stringify(entry.stock));
-                    saveCurrent();
-                    renderEditor();
-                    showScreen("editor");
-                }
-            });
-        });
-        document.querySelectorAll(".delete-history-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
-                if (confirm("Удалить этот отчёт?")) {
-                    history = history.filter(h => h.id !== id);
-                    saveHistory();
-                    renderHistory();
-                }
-            });
-        });
+    function renderHistory() { 
+        let container = document.getElementById("historyList"); let empty = document.getElementById("historyEmptyMsg"); 
+        if (!container) return; 
+        if (!savedHistory.length) { container.innerHTML=""; empty.style.display="block"; return; } 
+        empty.style.display="none"; container.innerHTML = ""; 
+        for (let entry of savedHistory) { 
+            let dateStr = new Date(entry.date).toLocaleString(); 
+            let previewText = entry.fullMessage.split("\n")[0] || ""; 
+            if (previewText.length > 50) previewText = previewText.substring(0, 47) + "..."; 
+            let div = document.createElement("div"); div.className = "history-item"; div.setAttribute("data-id", entry.id); 
+            div.innerHTML = `<div><div class="history-date">📅 ${escapeHtml(dateStr)}</div><div class="history-preview">${escapeHtml(previewText)}</div></div><div class="history-right"><span class="history-chevron">›</span></div>`; 
+            div.onclick = () => openHistoryModal(entry.id, dateStr); 
+            container.appendChild(div); 
+        } 
     }
-
-    function escapeHtml(str) { return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
-
-    function showToast(msg) {
-        const toast = document.getElementById("toast");
-        toast.textContent = msg;
-        toast.style.opacity = "1";
-        setTimeout(() => toast.style.opacity = "0", 2000);
+    
+    let currentHistoryId = null;
+    function openHistoryModal(id, dateStr) { 
+        const entry = savedHistory.find(e => e.id === id); if (!entry) return; currentHistoryId = id; 
+        document.getElementById("historyModalTitle").innerHTML = `📅 ${dateStr}`;
+        document.getElementById("historyModalMessage").innerText = entry.fullMessage; 
+        document.getElementById("historyModal").classList.add("active"); 
     }
-
-    async function copyToClipboard(text, successMsg) {
-        if (navigator.clipboard && window.isSecureContext) {
-            try {
-                await navigator.clipboard.writeText(text);
-                showToast(successMsg);
-                return;
-            } catch(e) {}
-        }
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.top = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        let ok = false;
-        try { ok = document.execCommand('copy'); } catch(e) {}
-        document.body.removeChild(ta);
-        if (ok) showToast(successMsg);
-        else alert("Не удалось скопировать автоматически. Скопируйте вручную:\n\n" + text);
+    function closeHistoryModal() { document.getElementById("historyModal").classList.remove("active"); currentHistoryId = null; }
+    function copyCurrentHistory() { if (currentHistoryId === null) return; const entry = savedHistory.find(e => e.id === currentHistoryId); if (entry) copyToClipboard(entry.fullMessage, "Скопировано"); }
+    function editCurrentHistory() { 
+        if (currentHistoryId === null) return; 
+        const entry = savedHistory.find(e => e.id === currentHistoryId); 
+        if (entry) { 
+            stock = JSON.parse(JSON.stringify(entry.stock)); saveCurrent(); checkDraft(); 
+            setEditorDateFromHistory(entry.date);
+            renderGroupsChips(); renderGroupContent(); showScreen("editor"); closeHistoryModal(); 
+        } 
     }
-
-    // ---------- НАВИГАЦИЯ (безопасная, без ошибок history) ----------
-    let navigationStack = ['welcome'];
-
-    function showScreen(name, addToHistory = true) {
-        document.getElementById("welcomeScreen").classList.remove("active");
-        document.getElementById("editorScreen").classList.remove("active");
-        document.getElementById("previewScreen").classList.remove("active");
-        document.getElementById("historyScreen").classList.remove("active");
-        document.getElementById(name + "Screen").classList.add("active");
-        if (name === "history") renderHistory();
-        if (name === "editor") renderEditor();
-        if (addToHistory && navigationStack[navigationStack.length-1] !== name) {
-            navigationStack.push(name);
-            if (typeof history !== 'undefined' && history.pushState) {
-                try { history.pushState({ screen: name }, ""); } catch(e) {}
-            }
-        }
-    }
-
-    window.addEventListener('popstate', function(event) {
-        let currentScreen = null;
-        if (document.getElementById('welcomeScreen').classList.contains('active')) currentScreen = 'welcome';
-        else if (document.getElementById('editorScreen').classList.contains('active')) currentScreen = 'editor';
-        else if (document.getElementById('previewScreen').classList.contains('active')) currentScreen = 'preview';
-        else if (document.getElementById('historyScreen').classList.contains('active')) currentScreen = 'history';
-
-        if (currentScreen === 'editor') {
-            if (navigationStack.length > 1) navigationStack.pop();
-            showScreen('welcome', false);
-        } else if (currentScreen === 'preview') {
-            if (navigationStack.length > 1) navigationStack.pop();
-            showScreen('editor', false);
-        } else if (currentScreen === 'history') {
-            if (navigationStack.length > 1) navigationStack.pop();
-            showScreen('welcome', false);
-        }
-    });
-
-    function initNavigation() {
-        navigationStack = ['welcome'];
-        if (typeof history !== 'undefined' && history.replaceState) {
-            try { history.replaceState({ screen: 'welcome' }, ""); } catch(e) {}
-        }
-    }
-
-    // ---------- ЧЕРНОВИК: БЕЙДЖ ----------
-    function updateDraftBadge() {
-        const badge = document.getElementById("draftBadge");
-        if (badge) {
-            if (hasNonZeroStock()) {
-                badge.style.display = "inline-block";
-            } else {
-                badge.style.display = "none";
-            }
-        }
-    }
-
-    // ---------- ТЁМНАЯ ТЕМА И СТАТУС-БАР ----------
-    function initTheme() {
-        const saved = localStorage.getItem("theme");
-        const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (saved === "dark" || (!saved && dark)) {
-            document.body.classList.add("dark");
-            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
-                if (btn.textContent === "🌙") btn.textContent = "☀️";
-            });
-            const meta = document.querySelector('meta[name="theme-color"]');
-            if (meta) meta.setAttribute('content', '#121212');
-        } else {
-            document.body.classList.remove("dark");
-            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
-                if (btn.textContent === "☀️") btn.textContent = "🌙";
-            });
-            const meta = document.querySelector('meta[name="theme-color"]');
-            if (meta) meta.setAttribute('content', '#f0f2f5');
-        }
-    }
-    function toggleTheme() {
-        if (document.body.classList.contains("dark")) {
-            document.body.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
-                if (btn.textContent === "☀️") btn.textContent = "🌙";
-            });
-            const meta = document.querySelector('meta[name="theme-color"]');
-            if (meta) meta.setAttribute('content', '#f0f2f5');
-        } else {
-            document.body.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-            document.querySelectorAll(".theme-toggle, .nav-btn").forEach(btn => {
-                if (btn.textContent === "🌙") btn.textContent = "☀️";
-            });
-            const meta = document.querySelector('meta[name="theme-color"]');
-            if (meta) meta.setAttribute('content', '#121212');
-        }
-    }
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { if (!localStorage.getItem("theme")) initTheme(); });
-
-    // ---------- PWA И SERVICE WORKER (опционально, но для установки) ----------
-    let deferredPrompt;
-    window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const banner = document.getElementById("installBanner");
-        banner.style.display = "block";
-        banner.onclick = async () => {
-            banner.style.display = "none";
-            deferredPrompt.prompt();
-            await deferredPrompt.userChoice;
-            deferredPrompt = null;
-        };
-    });
-    if ('serviceWorker' in navigator && !window.location.href.includes('file://')) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed', err));
-    }
-
-    // ---------- ЗАПУСК ----------
+    function deleteCurrentHistory() { if (currentHistoryId === null) return; if (confirm("Удалить этот отчёт?")) { savedHistory = savedHistory.filter(e => e.id !== currentHistoryId); saveHistory(); renderHistory(); closeHistoryModal(); showToast("Отчёт удалён"); } }
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    function showToast(msg) { let toast=document.getElementById("toast"); toast.textContent=msg; toast.style.opacity="1"; setTimeout(()=>toast.style.opacity="0",2000); }
+    async function copyToClipboard(text,msg) { if(navigator.clipboard && window.isSecureContext) try { await navigator.clipboard.writeText(text); showToast(msg); return; } catch(e){} let ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.top="-9999px"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); if(ok) showToast(msg); else alert("Скопируйте вручную:\n"+text); }
+    const previewModal = document.getElementById("previewModal"); const modalMessage = document.getElementById("modalPreviewMessage");
+    function showPreviewModal() { modalMessage.innerText = generateMessage(); previewModal.classList.add("active"); }
+    function closePreviewModal() { previewModal.classList.remove("active"); }
+    async function onModalCopyFinish() { const msg = generateMessage(); await copyToClipboard(msg, "✅ Скопировано и сохранено!"); saveToHistory(); closePreviewModal(); showScreen("welcome"); renderGroupsChips(); renderGroupContent(); }
+    let currentScreenId = "welcome";
+    function showScreen(screenId) { if (currentScreenId === screenId) return; document.querySelectorAll(".screen").forEach(s => s.classList.remove("active")); document.getElementById(`${screenId}Screen`).classList.add("active"); currentScreenId = screenId; document.querySelectorAll(".nav-item").forEach(item => { if(item.dataset.screen === screenId) item.classList.add("active"); else item.classList.remove("active"); }); if (screenId === "history") renderHistory(); if (screenId === "editor") { renderGroupsChips(); renderGroupContent(); } window.history.pushState({ screen: screenId }, "", `#${screenId}`); }
+    function goBack() { let screens = ["welcome", "editor", "history"]; let idx = screens.indexOf(currentScreenId); if (idx > 0) showScreen(screens[idx-1]); else showToast("Вы на главном экране"); }
+    window.addEventListener("popstate", (e) => { let hash = window.location.hash.slice(1); if (["welcome","editor","history"].includes(hash)) showScreen(hash); else showScreen("welcome"); });
+    window.history.replaceState({ screen: "welcome" }, "", "#welcome");
+    function initTheme() { let saved = localStorage.getItem("theme"); let dark = window.matchMedia("(prefers-color-scheme: dark)").matches; if (saved === "dark" || (!saved && dark)) document.body.classList.add("dark"); else document.body.classList.remove("dark"); updateThemeButtons(); }
+    function updateThemeButtons() { let isDark = document.body.classList.contains("dark"); document.querySelectorAll(".icon-btn, #welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => { if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙"; }); }
+    function toggleTheme() { if (document.body.classList.contains("dark")) { document.body.classList.remove("dark"); localStorage.setItem("theme", "light"); } else { document.body.classList.add("dark"); localStorage.setItem("theme", "dark"); } updateThemeButtons(); }
+    let deferredPrompt; window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; });
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(console.error); }); }
     document.addEventListener("DOMContentLoaded", () => {
-        loadData();
-        initTheme();
-        initNavigation();
-        renderEditor();
-        updateDraftBadge();
-
-        if (hasNonZeroStock()) {
-            showScreen("editor");
-            showToast("📝 Продолжаем незавершённый отчёт");
-        } else {
-            showScreen("welcome");
-        }
-
-        // Приветственный экран
-        document.getElementById("newFromWelcomeBtn").onclick = () => {
-            if (hasNonZeroStock()) {
-                if (confirm("У вас есть незавершённый отчёт. Начать новый? Текущие данные будут потеряны.")) {
-                    resetAll();
-                    showScreen("editor");
-                }
-            } else {
-                resetAll();
-                showScreen("editor");
-            }
-        };
-        document.getElementById("historyFromWelcomeBtn").onclick = () => showScreen("history");
-        document.getElementById("welcomeThemeToggle").onclick = toggleTheme;
-
-        // Редактор
-        document.getElementById("resetBtn").onclick = () => {
-            if (hasNonZeroStock() && confirm("Обнулить все остатки? Черновик будет удалён.")) resetAll();
-            else if (!hasNonZeroStock()) resetAll();
-        };
-        document.getElementById("finishBtn").onclick = () => {
-            const msg = generateMessageFromStock();
-            document.getElementById("previewMessage").innerText = msg;
-            showScreen("preview");
-        };
-        document.getElementById("backToWelcomeFromEditor").onclick = () => showScreen("welcome");
-        document.getElementById("editorThemeToggle").onclick = toggleTheme;
-        document.getElementById("searchInput").addEventListener("input", (e) => {
-            searchTerm = e.target.value;
-            renderEditor();
-        });
-
-        // Превью
-        document.getElementById("copyAndFinishBtn").onclick = async () => {
-            const msg = generateMessageFromStock();
-            await copyToClipboard(msg, "✅ Скопировано и сохранено!");
-            saveToHistory();
-            updateDraftBadge();
-            showScreen("welcome");
-        };
-        document.getElementById("backToEditorFromPreview").onclick = () => showScreen("editor");
-        document.getElementById("homeFromPreview").onclick = () => showScreen("welcome");
-        document.getElementById("previewThemeToggle").onclick = toggleTheme;
-
-        // История
-        document.getElementById("clearHistoryBtn").onclick = () => {
-            if (confirm("Очистить всю историю?")) {
-                history = [];
-                saveHistory();
-                renderHistory();
-            }
-        };
-        document.getElementById("backToWelcomeFromHistory").onclick = () => showScreen("welcome");
+        loadData(); initTheme(); renderGroupsChips(); renderGroupContent();
+        document.querySelectorAll(".nav-item").forEach(btn => { btn.onclick = () => showScreen(btn.dataset.screen); });
+        document.getElementById("editorBackBtn").onclick = () => goBack(); document.getElementById("historyBackBtn").onclick = () => goBack();
+        document.getElementById("newFromWelcomeBtn").onclick = () => { if (hasDraft && confirm("Есть несохранённый черновик. Обнулить и начать новый?")) resetAll(); else if (!hasDraft) resetAll(); showScreen("editor"); };
+        document.getElementById("draftFromWelcomeBtn").onclick = () => showScreen("editor"); document.getElementById("historyFromWelcomeBtn").onclick = () => showScreen("history");
+        document.getElementById("welcomeThemeToggle").onclick = toggleTheme; document.getElementById("resetBtn").onclick = () => { if(confirm("Обнулить все остатки?")) resetAll(); };
+        document.getElementById("finishBtn").onclick = () => showPreviewModal(); document.getElementById("editorThemeToggle").onclick = toggleTheme;
+        const searchInput = document.getElementById("searchInput"); const clearBtn = document.getElementById("searchClearBtn");
+        searchInput.addEventListener("input", (e) => { clearTimeout(searchDebounce); searchDebounce = setTimeout(() => { searchTerm = e.target.value.toLowerCase(); renderGroupsChips(); clearBtn.style.display = searchTerm ? "block" : "none"; }, 200); });
+        clearBtn.onclick = () => { searchInput.value = ""; searchTerm = ""; renderGroupsChips(); clearBtn.style.display = "none"; scrollToActiveGroupChip(); };
+        document.getElementById("clearHistoryBtn").onclick = () => { if(confirm("Очистить всю историю?")) { savedHistory = []; saveHistory(); renderHistory(); } };
         document.getElementById("historyThemeToggle").onclick = toggleTheme;
+        document.getElementById("modalCopyFinishBtn").onclick = onModalCopyFinish; document.getElementById("previewModalCloseBtn").onclick = closePreviewModal; previewModal.addEventListener("click", (e) => { if(e.target === previewModal) closePreviewModal(); });
+        document.getElementById("historyModalCopyBtn").onclick = copyCurrentHistory; document.getElementById("historyModalEditBtn").onclick = editCurrentHistory; document.getElementById("historyModalDeleteBtn").onclick = deleteCurrentHistory; document.getElementById("historyModalCloseBtn").onclick = closeHistoryModal; document.getElementById("historyModal").addEventListener("click", (e) => { if(e.target === document.getElementById("historyModal")) closeHistoryModal(); });
+        if (hasDraft) document.getElementById("draftFromWelcomeBtn").style.display = "flex";
     });
 })();
 </script>
