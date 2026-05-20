@@ -1,0 +1,30 @@
+{
+  "name": "СкладРасклад",
+  "short_name": "СкладРасклад",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1e88e5",
+  "background_color": "#f0f2f5",
+  "icons": [
+    {
+      "src": "icon-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
