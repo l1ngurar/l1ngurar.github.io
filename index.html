@@ -36,31 +36,30 @@
         
         /* Единая шапка для всех экранов */
         .app-header {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            padding: 4px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding: 4px 0;
         }
         .app-header h1 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--primary), #6c5ce7);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-align: center;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, var(--primary), #6c5ce7);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        text-align: center;
+        margin: 0;
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         }
-        /* На главном экране заголовок крупнее */
-        .welcome-header .app-header h1 {
-            font-size: 1.6rem;
+        /* Увеличенный шрифт для главного экрана */
+        .welcome-header h1 {
+        font-size: 1.6rem;
         }
         .icon-btn {
             background: var(--surface);
@@ -172,11 +171,10 @@
 <div class="app-container">
     <!-- ЭКРАН ПРИВЕТСТВИЯ -->
     <div id="welcomeScreen" class="screen active">
-        <div class="app-header welcome-header">
-            <div></div>
-            <h1>СкладРасклад</h1>
-            <button id="welcomeThemeToggle" class="icon-btn">🌙</button>
-        </div>
+    <div class="app-header welcome-header">
+    <h1>СкладРасклад</h1>
+    <button id="welcomeThemeToggle" class="icon-btn">🌙</button>
+    </div>
         <div class="card" style="text-align: center; padding: 32px 20px;">
             <img src="./icon-256.png" alt="logo" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 16px;">
             <p style="margin: 16px 0 24px; color: var(--text-secondary); font-size: 1rem;">Создаватель склад-расклада :D</p>
