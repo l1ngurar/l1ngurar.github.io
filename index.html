@@ -110,7 +110,17 @@
         .btn-primary { background: var(--btn-primary-bg); border-color: var(--btn-primary-bg); color: var(--btn-primary-text); }
         .btn-danger { background: var(--btn-danger-bg); border-color: var(--btn-danger-text); color: var(--btn-danger-text); }
         .btn-secondary { background: var(--btn-default-bg); border: 1px solid var(--btn-default-border); }
-        .nav-btn { font-size: 1.2rem; padding: 6px 12px; min-width: 48px; }
+        .nav-btn {
+    font-size: 1.3rem;       /* чуть увеличим для лучшего вида */
+    min-width: 48px;
+    height: 44px;            /* фиксированная высота */
+    padding: 0;              /* убираем отступы, чтобы центровка была точной */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-sizing: border-box;
+}
         .draft-badge {
             background: #ff9800;
             color: white;
