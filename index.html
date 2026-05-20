@@ -711,7 +711,8 @@
         document.getElementById("historyScreen").classList.remove("active");
         document.getElementById(name + "Screen").classList.add("active");
         if (name === "history") renderHistory();
-        if (name === "editor") renderEditor();
+        if (name === "editor") renderEditor();\
+        history.pushState(null, null);
     }
 
     function initTheme() {
