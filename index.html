@@ -857,6 +857,7 @@ function initNavigation() {
     document.addEventListener("DOMContentLoaded", () => {
         loadData();
         initTheme();
+        initNavigation();
         renderEditor();
 
         document.getElementById("newFromWelcomeBtn").onclick = () => { resetAll(); showScreen("editor"); };
