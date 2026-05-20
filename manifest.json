@@ -3,7 +3,7 @@
   "short_name": "СкладРасклад",
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#f0f2f5",
+  "theme_color": "#121212",
   "background_color": "#ffffff",
   "icons": [
     {
