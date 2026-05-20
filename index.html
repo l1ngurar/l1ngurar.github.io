@@ -636,65 +636,78 @@
         }
     }
 
-    function renderHistory() {
-        const container = document.getElementById("historyList");
-        const emptyMsg = document.getElementById("historyEmptyMsg");
-        if (!container) return;
-        if (history.length === 0) {
-            container.innerHTML = "";
-            emptyMsg.style.display = "block";
-            return;
-        }
-        emptyMsg.style.display = "none";
+function renderHistory() {
+    const container = document.getElementById("historyList");
+    const emptyMsg = document.getElementById("historyEmptyMsg");
+    if (!container) return;
+    if (history.length === 0) {
         container.innerHTML = "";
-        for (let entry of history) {
-            const dateStr = new Date(entry.date).toLocaleString();
-            const full = entry.fullMessage;
-            const preview = full.split("\n").slice(0, 3).join("\n") + (full.split("\n").length > 3 ? "\n..." : "");
-            const div = document.createElement("div");
-            div.className = "history-item";
-            div.innerHTML = `
-                <div class="history-header">
-                    <div class="history-date">📅 ${escapeHtml(dateStr)}</div>
-                    <div class="history-expand-icon">▼</div>
-                </div>
-                <div class="history-preview">${escapeHtml(preview)}</div>
-                <div class="history-full">${escapeHtml(full)}</div>
-                <div class="history-actions">
-                    <button class="copy-history-btn" data-id="${entry.id}">📋 Копировать</button>
-                    <button class="edit-history-btn" data-id="${entry.id}">✏️ Редактировать</button>
-                </div>
-            `;
-            container.appendChild(div);
-            const header = div.querySelector(".history-header");
-            header.addEventListener("click", (e) => {
-                if (e.target.tagName === 'BUTTON') return;
-                div.classList.toggle("open");
-            });
-        }
-        document.querySelectorAll(".copy-history-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
-                const entry = history.find(h => h.id === id);
-                if (entry) copyToClipboard(entry.fullMessage, "Скопировано");
-            });
-        });
-        document.querySelectorAll(".edit-history-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
-                const entry = history.find(h => h.id === id);
-                if (entry) {
-                    stock = JSON.parse(JSON.stringify(entry.stock));
-                    saveCurrent();
-                    renderEditor();
-                    showScreen("editor");
-                }
-            });
+        emptyMsg.style.display = "block";
+        return;
+    }
+    emptyMsg.style.display = "none";
+    container.innerHTML = "";
+    for (let entry of history) {
+        const dateStr = new Date(entry.date).toLocaleString();
+        const full = entry.fullMessage;
+        const preview = full.split("\n").slice(0, 3).join("\n") + (full.split("\n").length > 3 ? "\n..." : "");
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `
+            <div class="history-header">
+                <div class="history-date">📅 ${escapeHtml(dateStr)}</div>
+                <div class="history-expand-icon">▼</div>
+            </div>
+            <div class="history-preview">${escapeHtml(preview)}</div>
+            <div class="history-full">${escapeHtml(full)}</div>
+            <div class="history-actions">
+                <button class="copy-history-btn" data-id="${entry.id}">📋 Копировать</button>
+                <button class="edit-history-btn" data-id="${entry.id}">✏️ Редактировать</button>
+                <button class="delete-history-btn" data-id="${entry.id}">🗑 Удалить</button>
+            </div>
+        `;
+        container.appendChild(div);
+        const header = div.querySelector(".history-header");
+        header.addEventListener("click", (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            div.classList.toggle("open");
         });
     }
-
+    document.querySelectorAll(".copy-history-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const entry = history.find(h => h.id === id);
+            if (entry) copyToClipboard(entry.fullMessage, "Скопировано");
+        });
+    });
+    document.querySelectorAll(".edit-history-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            const entry = history.find(h => h.id === id);
+            if (entry) {
+                stock = JSON.parse(JSON.stringify(entry.stock));
+                saveCurrent();
+                renderEditor();
+                showScreen("editor");
+            }
+        });
+    });
+    // 👇 НОВЫЙ ОБРАБОТЧИК УДАЛЕНИЯ
+    document.querySelectorAll(".delete-history-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const id = parseInt(btn.dataset.id);
+            if (confirm("Удалить этот отчёт?")) {
+                history = history.filter(h => h.id !== id);
+                saveHistory();
+                renderHistory(); // перерисовываем
+            }
+        });
+    });
+}
+    
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 
     function showToast(msg) {
