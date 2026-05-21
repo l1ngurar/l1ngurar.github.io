@@ -1,10 +1,9 @@
-const CACHE_NAME = 'skladrasklad-v11';
+const CACHE_NAME = 'skladrasklad-v12';
 
 const urlsToCache = [
   './',
   './index.html',
-  './manifest-light.json',
-  './manifest-dark.json',
+  './manifest.json',
   './icon-64.png',
   './icon-256.png',
   './icon-512.png'
