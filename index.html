@@ -33,7 +33,7 @@
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Универсальная шапка с абсолютным позиционированием кнопок */
+        /* Шапка: центровка заголовка через flex + absolute для кнопок */
         .app-header {
             position: relative;
             display: flex;
@@ -60,6 +60,7 @@
         .welcome-header h1 {
             font-size: 1.6rem;
         }
+        /* Кнопки по краям */
         .app-header .icon-btn:first-child {
             position: absolute;
             left: 0;
@@ -96,6 +97,21 @@
         .btn-danger { background: var(--danger-bg); color: var(--danger); }
         .btn-danger:active { background: #ffcdd2; transform: scale(0.96); }
         .btn:active { transform: scale(0.96); }
+        
+        /* Баннер установки */
+        .install-banner {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .install-banner:active { transform: scale(0.98); background: var(--primary-dark); }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -180,6 +196,9 @@
 <body>
 <div id="toast" class="toast"></div>
 <div class="app-container">
+    <!-- Баннер установки -->
+    <div id="installBanner" class="install-banner" style="display: none;">📲 Установить приложение</div>
+
     <!-- ЭКРАН ПРИВЕТСТВИЯ -->
     <div id="welcomeScreen" class="screen active">
         <div class="app-header welcome-header">
@@ -196,7 +215,7 @@
         <footer style="text-align: center; font-size: 12px; margin-top: 24px;">
             Первая в истории конторы приблуда для<br>
             упрощения еженедельной рутины.<br>
-            Навайбкодил с любовью ❤️<br>
+            Навайбкодил с любовью ❤️
         </footer>
     </div>
 
@@ -295,6 +314,10 @@
     let stock = {}, savedHistory = [], searchTerm = "", selectedGroup = GROUPS[0].name, selectedVariant = {}, hasDraft = false, searchDebounce;
     let currentEditDate = null;
     const STORAGE_CURRENT = "sklad_grouped", STORAGE_HISTORY = "sklad_history", STORAGE_SELECTED_GROUP = "sklad_selected_group";
+
+    // PWA установка
+    let deferredPrompt;
+    const installBanner = document.getElementById("installBanner");
 
     function initStock() { let st = {}; for (let g of GROUPS) { st[g.name] = {}; for (let v of g.variants) { st[g.name][v] = {}; let cols = getColors(`${g.name} ${v}`); for (let c of cols) st[g.name][v][c] = 0; } } return st; }
     function loadData() {
@@ -471,8 +494,9 @@
     window.addEventListener("popstate", (e) => { let hash = window.location.hash.slice(1); if (["welcome","editor","history"].includes(hash)) showScreen(hash); else showScreen("welcome"); });
     window.history.replaceState({ screen: "welcome" }, "", "#welcome");
     
+    // Динамический цвет статус-бара
     function updateThemeColor() {
-        const isDark = document.body.classList.contains("dark");
+        const isDark = document.body.classList.contains('dark');
         const color = isDark ? '#121212' : '#f0f2f5';
         const meta = document.querySelector('meta[name="theme-color"]');
         if (meta) meta.setAttribute('content', color);
@@ -486,20 +510,48 @@
         updateThemeColor();
         updateThemeButtons();
     }
-    function updateThemeButtons() { let isDark = document.body.classList.contains("dark"); document.querySelectorAll(".icon-btn, #welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => { if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙"; }); }
-    function toggleTheme() {
-        if (document.body.classList.contains("dark")) {
-            document.body.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-        } else {
-            document.body.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-        }
-        updateThemeColor();
-        updateThemeButtons();
+    function updateThemeButtons() { 
+        let isDark = document.body.classList.contains("dark"); 
+        document.querySelectorAll(".icon-btn, #welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => { 
+            if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙"; 
+        }); 
     }
-    let deferredPrompt; window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; });
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(console.error); }); }
+    function toggleTheme() { 
+        if (document.body.classList.contains("dark")) { 
+            document.body.classList.remove("dark"); 
+            localStorage.setItem("theme", "light"); 
+        } else { 
+            document.body.classList.add("dark"); 
+            localStorage.setItem("theme", "dark"); 
+        } 
+        updateThemeColor();
+        updateThemeButtons(); 
+    }
+    
+    // PWA installation
+    window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBanner) installBanner.style.display = "block";
+    });
+    if (installBanner) {
+        installBanner.addEventListener("click", async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === "accepted") {
+                installBanner.style.display = "none";
+            }
+            deferredPrompt = null;
+        });
+    }
+    
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => { 
+            navigator.serviceWorker.register('./sw.js').catch(console.error); 
+        });
+    }
+    
     document.addEventListener("DOMContentLoaded", () => {
         loadData(); initTheme(); renderGroupsChips(); renderGroupContent();
         document.querySelectorAll(".nav-item").forEach(btn => { btn.onclick = () => showScreen(btn.dataset.screen); });
