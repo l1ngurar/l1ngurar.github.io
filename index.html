@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>СкладРасклад</title>
     <meta name="theme-color" id="themeColorMeta" content="#f0f2f5">
-    <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./icon-64.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
@@ -246,15 +245,6 @@
 
 <script>
 (function(){
-    const GROUPS = [ /* ... полный список GROUPS как раньше ... */ ];
-    // Для краткости я не буду переписывать весь список GROUPS, он у вас уже есть.
-    // Но здесь он должен быть полностью. В финальной версии он будет.
-    // Убедитесь, что GROUPS определён. В вашем файле он был. Я его пропустил для экономии места,
-    // но вы должны вставить свой полный массив GROUPS (он длинный). Я пока оставлю заглушку.
-    // На практике вам нужно скопировать массив GROUPS из вашего текущего файла.
-    // Ниже я привожу всё остальное с исправленной логикой темы.
-
-    // ---------- НАЧАЛО ВАШЕГО МАССИВА GROUPS ----------
     const GROUPS = [
         { name: "X", variants: ["64","256"] }, { name: "XS", variants: ["64","256","512"] }, { name: "XS Max", variants: ["64","256","512"] },
         { name: "XR", variants: ["64","128","256"] }, { name: "11", variants: ["64","128","256"] }, { name: "11 Pro", variants: ["64","256","512"] },
@@ -266,10 +256,8 @@
         { name: "15 Pro", variants: ["128","256","512","1TB"] }, { name: "15 Pro Max", variants: ["256","512","1TB"] }, { name: "16", variants: ["128","256","512"] },
         { name: "16 Plus", variants: ["128","256","512"] }, { name: "16 Pro", variants: ["128","256","512","1TB"] }, { name: "16 Pro Max", variants: ["256","512","1TB"] }
     ];
-    // ---------- КОНЕЦ МАССИВА GROUPS ----------
 
     function getColors(modelName) {
-        // ... ваша функция getColors без изменений ...
         let colors;
         if (modelName.startsWith("X ")) colors = ["🖤","🤍"];
         else if (modelName.includes("XS")) colors = ["🖤","🤍","💛"];
