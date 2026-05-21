@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skladrasklad-v12';
+const CACHE_NAME = 'skladrasklad-v13';
 
 const urlsToCache = [
   './',
