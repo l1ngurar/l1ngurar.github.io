@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <script>
+  (function() {
+    let useDark = false;
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') useDark = true;
+      else if (saved === 'light') useDark = false;
+      else useDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch(e) {}
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = useDark ? './manifest-dark.json' : './manifest-light.json';
+    document.head.appendChild(link);
+  })();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>СкладРасклад</title>
