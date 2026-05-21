@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>СкладРасклад</title>
     <meta name="theme-color" id="themeColorMeta" content="#f0f2f5">
-    <link rel="icon" type="image/png" href="./icon-64.png">
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/png" href="./icon-64.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -244,6 +244,21 @@
 <div id="previewModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>📄 Превью</h3><button class="modal-close" id="previewModalCloseBtn">&times;</button></div><div class="modal-body" id="modalPreviewMessage"></div><div class="modal-footer"><button id="modalCopyFinishBtn" class="btn btn-primary">📋 Скопировать и завершить</button></div></div></div>
 <div id="historyModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3 id="historyModalTitle"></h3><button class="modal-close" id="historyModalCloseBtn">&times;</button></div><div class="modal-body" id="historyModalMessage"></div><div class="modal-footer"><button id="historyModalCopyBtn" class="btn btn-primary">Копировать</button><button id="historyModalEditBtn" class="btn">Редактировать</button><button id="historyModalDeleteBtn" class="btn btn-danger">Удалить</button></div></div></div>
 
+<!-- Модальное окно выбора темы -->
+<div id="themeModal" class="modal-overlay" style="z-index: 300;">
+    <div class="modal-content" style="max-width: 280px;">
+        <div class="modal-header">
+            <h3>Оформление</h3>
+            <button class="modal-close" id="themeModalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: none; margin: 0;">
+            <button id="themeLightBtn" class="btn" style="justify-content: flex-start;">☀️ Светлая</button>
+            <button id="themeDarkBtn" class="btn" style="justify-content: flex-start;">🌙 Тёмная</button>
+            <button id="themeSystemBtn" class="btn" style="justify-content: flex-start;">🖥️ Как в системе</button>
+        </div>
+    </div>
+</div>
+
 <script>
 (function(){
     const GROUPS = [
@@ -304,7 +319,6 @@
 
     let stock = {}, savedHistory = [], searchTerm = "", selectedGroup = GROUPS[0].name, selectedVariant = {}, hasDraft = false, searchDebounce;
     let currentEditDate = null;
-    let userThemeOverride = false; // флаг: true если пользователь вручную переключил тему
     const STORAGE_CURRENT = "sklad_grouped", STORAGE_HISTORY = "sklad_history", STORAGE_SELECTED_GROUP = "sklad_selected_group";
 
     function initStock() { let st = {}; for (let g of GROUPS) { st[g.name] = {}; for (let v of g.variants) { st[g.name][v] = {}; let cols = getColors(`${g.name} ${v}`); for (let c of cols) st[g.name][v][c] = 0; } } return st; }
@@ -482,7 +496,7 @@
     window.addEventListener("popstate", (e) => { let hash = window.location.hash.slice(1); if (["welcome","editor","history"].includes(hash)) showScreen(hash); else showScreen("welcome"); });
     window.history.replaceState({ screen: "welcome" }, "", "#welcome");
     
-    // =============== ДИНАМИЧЕСКАЯ ТЕМА (системная + ручное переопределение) ===============
+    // =============== УПРАВЛЕНИЕ ТЕМОЙ (светлая / тёмная / системная) ===============
     function updateThemeColor() {
         const isDark = document.body.classList.contains('dark');
         const color = isDark ? '#121212' : '#f0f2f5';
@@ -491,63 +505,65 @@
     }
     
     function updateThemeButtons() {
-        let isDark = document.body.classList.contains("dark");
-        document.querySelectorAll(".icon-btn, #welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => {
-            if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙";
+        const isDark = document.body.classList.contains("dark");
+        document.querySelectorAll("#welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => {
+            if (btn) btn.textContent = isDark ? "☀️" : "🌙";
         });
     }
     
-    // Применяет системную тему (если пользователь не переопределил)
-    function applySystemTheme() {
-        if (userThemeOverride) return; // не трогаем, если пользователь выбрал вручную
-        const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-        if (darkModeMedia.matches) {
-            document.body.classList.add("dark");
-        } else {
-            document.body.classList.remove("dark");
-        }
-        // Удаляем сохранённую тему, чтобы при следующем запуске снова следовать системе
-        localStorage.removeItem("theme");
-        updateThemeColor();
-        updateThemeButtons();
-    }
+    // Применить тему в зависимости от выбранного режима
+    let currentThemeMode = "system"; // "light", "dark", "system"
     
-    // Ручное переключение темы (кнопкой)
-    function toggleTheme() {
-        userThemeOverride = true;
-        if (document.body.classList.contains("dark")) {
+    function applyTheme(mode) {
+        if (mode === "light") {
             document.body.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-        } else {
+        } else if (mode === "dark") {
             document.body.classList.add("dark");
-            localStorage.setItem("theme", "dark");
+        } else if (mode === "system") {
+            const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (dark) document.body.classList.add("dark");
+            else document.body.classList.remove("dark");
         }
         updateThemeColor();
         updateThemeButtons();
     }
     
-    // Инициализация темы при загрузке
+    function setThemeMode(mode) {
+        currentThemeMode = mode;
+        if (mode === "system") {
+            localStorage.removeItem("theme");
+        } else {
+            localStorage.setItem("theme", mode);
+        }
+        applyTheme(mode);
+        closeThemeModal();
+    }
+    
     function initTheme() {
-        let saved = localStorage.getItem("theme");
-        if (saved === "dark" || saved === "light") {
-            userThemeOverride = true;
-            if (saved === "dark") document.body.classList.add("dark");
-            else document.body.classList.remove("dark");
+        const saved = localStorage.getItem("theme");
+        if (saved === "light") {
+            currentThemeMode = "light";
+        } else if (saved === "dark") {
+            currentThemeMode = "dark";
         } else {
-            userThemeOverride = false;
-            const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-            if (darkModeMedia.matches) document.body.classList.add("dark");
-            else document.body.classList.remove("dark");
+            currentThemeMode = "system";
         }
-        updateThemeColor();
-        updateThemeButtons();
+        applyTheme(currentThemeMode);
+        // Слушаем изменения системной темы, если режим "system"
+        const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+        darkModeMedia.addEventListener('change', (e) => {
+            if (currentThemeMode === "system") {
+                applyTheme("system");
+            }
+        });
     }
     
-    // Слушаем изменение системной темы
-    const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-    darkModeMedia.addEventListener('change', applySystemTheme);
+    // Модальное окно выбора темы
+    const themeModal = document.getElementById("themeModal");
+    function showThemeModal() { themeModal.classList.add("active"); }
+    function closeThemeModal() { themeModal.classList.remove("active"); }
     
-    // =============== ОСТАЛЬНОЕ (PWA, установка) ===============
+    // =============== PWA УСТАНОВКА ===============
     let deferredPrompt;
     const installBanner = document.getElementById("installBanner");
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -579,15 +595,15 @@
         document.getElementById("editorBackBtn").onclick = () => goBack(); document.getElementById("historyBackBtn").onclick = () => goBack();
         document.getElementById("newFromWelcomeBtn").onclick = () => { if (hasDraft && confirm("Есть несохранённый черновик. Обнулить и начать новый?")) resetAll(); else if (!hasDraft) resetAll(); showScreen("editor"); };
         document.getElementById("draftFromWelcomeBtn").onclick = () => showScreen("editor"); document.getElementById("historyFromWelcomeBtn").onclick = () => showScreen("history");
-        document.getElementById("welcomeThemeToggle").onclick = toggleTheme; 
+        document.getElementById("welcomeThemeToggle").onclick = showThemeModal;
+        document.getElementById("editorThemeToggle").onclick = showThemeModal;
+        document.getElementById("historyThemeToggle").onclick = showThemeModal;
         document.getElementById("resetBtn").onclick = () => { if(confirm("Обнулить все остатки?")) resetAll(); };
         document.getElementById("finishBtn").onclick = () => showPreviewModal(); 
-        document.getElementById("editorThemeToggle").onclick = toggleTheme;
         const searchInput = document.getElementById("searchInput"); const clearBtn = document.getElementById("searchClearBtn");
         searchInput.addEventListener("input", (e) => { clearTimeout(searchDebounce); searchDebounce = setTimeout(() => { searchTerm = e.target.value.toLowerCase(); renderGroupsChips(); clearBtn.style.display = searchTerm ? "block" : "none"; }, 200); });
         clearBtn.onclick = () => { searchInput.value = ""; searchTerm = ""; renderGroupsChips(); clearBtn.style.display = "none"; scrollToActiveGroupChip(); };
         document.getElementById("clearHistoryBtn").onclick = () => { if(confirm("Очистить всю историю?")) { savedHistory = []; saveHistory(); renderHistory(); } };
-        document.getElementById("historyThemeToggle").onclick = toggleTheme;
         document.getElementById("modalCopyFinishBtn").onclick = onModalCopyFinish; 
         document.getElementById("previewModalCloseBtn").onclick = closePreviewModal; 
         previewModal.addEventListener("click", (e) => { if(e.target === previewModal) closePreviewModal(); });
@@ -596,6 +612,14 @@
         document.getElementById("historyModalDeleteBtn").onclick = deleteCurrentHistory; 
         document.getElementById("historyModalCloseBtn").onclick = closeHistoryModal; 
         document.getElementById("historyModal").addEventListener("click", (e) => { if(e.target === document.getElementById("historyModal")) closeHistoryModal(); });
+        
+        // Кнопки выбора темы
+        document.getElementById("themeLightBtn").onclick = () => setThemeMode("light");
+        document.getElementById("themeDarkBtn").onclick = () => setThemeMode("dark");
+        document.getElementById("themeSystemBtn").onclick = () => setThemeMode("system");
+        document.getElementById("themeModalCloseBtn").onclick = closeThemeModal;
+        themeModal.addEventListener("click", (e) => { if(e.target === themeModal) closeThemeModal(); });
+        
         if (hasDraft) document.getElementById("draftFromWelcomeBtn").style.display = "flex";
     });
 })();
