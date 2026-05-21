@@ -1,26 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <script>
-  (function() {
-    let useDark = false;
-    try {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark') useDark = true;
-      else if (saved === 'light') useDark = false;
-      else useDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch(e) {}
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = useDark ? './manifest-dark.json' : './manifest-light.json';
-    document.head.appendChild(link);
-  })();
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>СкладРасклад</title>
     <meta name="theme-color" id="themeColorMeta" content="#f0f2f5">
     <link rel="icon" type="image/png" href="./icon-64.png">
+    <link rel="manifest" href="./manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
