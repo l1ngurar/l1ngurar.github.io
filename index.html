@@ -327,6 +327,7 @@
 
     let stock = {}, savedHistory = [], searchTerm = "", selectedGroup = GROUPS[0].name, selectedVariant = {}, hasDraft = false, searchDebounce;
     let currentEditDate = null;
+    let userThemeOverride = false; // false - следовать системе, true - фиксированная тема
     const STORAGE_CURRENT = "sklad_grouped", STORAGE_HISTORY = "sklad_history", STORAGE_SELECTED_GROUP = "sklad_selected_group";
 
     // PWA установка
@@ -516,31 +517,54 @@
         if (meta) meta.setAttribute('content', color);
     }
     
-    function initTheme() {
-        let saved = localStorage.getItem("theme");
-        let dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (saved === "dark" || (!saved && dark)) document.body.classList.add("dark");
+   function initTheme() {
+    let saved = localStorage.getItem("theme");
+    if (saved === "dark" || saved === "light") {
+        userThemeOverride = true;
+        if (saved === "dark") document.body.classList.add("dark");
         else document.body.classList.remove("dark");
-        updateThemeColor();
-        updateThemeButtons();
+    } else {
+        userThemeOverride = false;
+        // Следуем системе
+        const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+        if (darkModeMedia.matches) document.body.classList.add("dark");
+        else document.body.classList.remove("dark");
     }
+    updateThemeColor();
+    updateThemeButtons();
+}
     function updateThemeButtons() { 
         let isDark = document.body.classList.contains("dark"); 
         document.querySelectorAll(".icon-btn, #welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => { 
             if (btn.textContent === "🌙" || btn.textContent === "☀️") btn.textContent = isDark ? "☀️" : "🌙"; 
         }); 
     }
-    function toggleTheme() { 
-        if (document.body.classList.contains("dark")) { 
-            document.body.classList.remove("dark"); 
-            localStorage.setItem("theme", "light"); 
-        } else { 
-            document.body.classList.add("dark"); 
-            localStorage.setItem("theme", "dark"); 
-        } 
-        updateThemeColor();
-        updateThemeButtons(); 
+    function toggleTheme() {
+    userThemeOverride = true;
+    if (document.body.classList.contains("dark")) {
+        document.body.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+    } else {
+        document.body.classList.add("dark");
+        localStorage.setItem("theme", "dark");
     }
+    updateThemeColor();
+    updateThemeButtons();
+}
+
+    function applySystemTheme() {
+    if (userThemeOverride) return; // пользователь выбрал вручную, не трогаем
+    const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    if (darkModeMedia.matches) {
+        document.body.classList.add("dark");
+        localStorage.removeItem("theme"); // убираем сохранённую, чтобы не зафиксировать
+    } else {
+        document.body.classList.remove("dark");
+        localStorage.removeItem("theme");
+    }
+    updateThemeColor();
+    updateThemeButtons();
+}
     
     // PWA installation
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -582,6 +606,9 @@
         document.getElementById("modalCopyFinishBtn").onclick = onModalCopyFinish; document.getElementById("previewModalCloseBtn").onclick = closePreviewModal; previewModal.addEventListener("click", (e) => { if(e.target === previewModal) closePreviewModal(); });
         document.getElementById("historyModalCopyBtn").onclick = copyCurrentHistory; document.getElementById("historyModalEditBtn").onclick = editCurrentHistory; document.getElementById("historyModalDeleteBtn").onclick = deleteCurrentHistory; document.getElementById("historyModalCloseBtn").onclick = closeHistoryModal; document.getElementById("historyModal").addEventListener("click", (e) => { if(e.target === document.getElementById("historyModal")) closeHistoryModal(); });
         if (hasDraft) document.getElementById("draftFromWelcomeBtn").style.display = "flex";
+        // Следим за изменением системной темы
+        const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+        darkModeMedia.addEventListener('change', applySystemTheme);
     });
 })();
 </script>
