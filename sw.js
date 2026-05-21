@@ -3,7 +3,8 @@ const CACHE_NAME = 'skladrasklad-v10';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json',
+  './manifest-light.json',
+  './manifest-dark.json',
   './icon-64.png',
   './icon-256.png',
   './icon-512.png'
