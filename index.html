@@ -576,38 +576,45 @@
             for (let col of colors) {
                 let val = stock[group.name][currentVariant][col] || 0;
                 let row = document.createElement("div");
-                row.className = "color-row";
-                let left = document.createElement("div");
-                left.className = "color-info";
-                left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${getColorName(col, fullModelName)}</span>`;
-                row.appendChild(left);
-                let counter = document.createElement("div");
-                counter.className = "counter";
-                let btnMinus = document.createElement("button");
-                btnMinus.textContent = "−";
-                btnMinus.onclick = (e) => {
-                    e.stopPropagation();
-                    let newVal = Math.max(0, val-1);
-                    updateStockColor(group.name, currentVariant, col, newVal);
-                };
-                let input = document.createElement("input");
-                input.type = "number";
-                input.value = val;
-                input.onchange = (e) => {
-                    let vv = parseInt(e.target.value);
-                    if(isNaN(vv)) vv=0;
-                    if(vv<0) vv=0;
-                    updateStockColor(group.name, currentVariant, col, vv);
-                };
-                let btnPlus = document.createElement("button");
-                btnPlus.textContent = "+";
-                btnPlus.onclick = (e) => {
-                    e.stopPropagation();
-                    updateStockColor(group.name, currentVariant, col, val+1);
-                };
-                counter.append(btnMinus, input, btnPlus);
-                row.appendChild(counter);
-                colorsContainer.appendChild(row);
+            row.className = "color-row";
+            let left = document.createElement("div");
+            left.className = "color-info";
+            left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${getColorName(col, fullModelName)}</span>`;
+            row.appendChild(left);
+            let counter = document.createElement("div");
+            counter.className = "counter";
+            let input = document.createElement("input");
+            input.type = "number";
+            input.value = val;
+            let btnMinus = document.createElement("button");
+            btnMinus.textContent = "−";
+            let btnPlus = document.createElement("button");
+            btnPlus.textContent = "+";
+
+            btnMinus.onclick = (e) => {
+            e.stopPropagation();
+            let currentVal = parseInt(input.value) || 0;
+            let newVal = Math.max(0, currentVal - 1);
+            input.value = newVal;
+            updateStockColor(group.name, currentVariant, col, newVal);
+        };
+        btnPlus.onclick = (e) => {
+            e.stopPropagation();
+            let currentVal = parseInt(input.value) || 0;
+            let newVal = currentVal + 1;
+            input.value = newVal;
+            updateStockColor(group.name, currentVariant, col, newVal);
+        };
+        input.onchange = (e) => {
+            let vv = parseInt(e.target.value);
+            if (isNaN(vv)) vv = 0;
+            if (vv < 0) vv = 0;
+            input.value = vv;
+            updateStockColor(group.name, currentVariant, col, vv);
+        };
+        counter.append(btnMinus, input, btnPlus);
+        row.appendChild(counter);
+        colorsContainer.appendChild(row);
             }
             colorsContainer.classList.remove("fade-out");
         }, 120);
