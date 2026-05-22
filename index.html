@@ -70,23 +70,22 @@
             transform: translateY(-50%);
         }
         .icon-btn {
-        background: var(--surface);
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 30px;
-        font-size: 1.3rem;
-        cursor: pointer;
-        color: var(--text-primary);
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: var(--shadow-sm);
-        flex-shrink: 0;
-        line-height: 1;
-        padding: 0;
-        text-align: center;
+            background: var(--surface);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 30px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            line-height: 1;
+            padding: 0;
         }
         .icon-btn:active { transform: scale(0.94); background: var(--surface-2); }
         .card { background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; transition: var(--transition); }
@@ -158,14 +157,9 @@
         }
         .editor-active {
             display: none;
-            animation: contentFadeIn 0.2s ease;
         }
         .editor-active.active {
             display: block;
-        }
-        @keyframes contentFadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         
         .search-wrapper { position: relative; margin-bottom: 16px; }
@@ -246,6 +240,7 @@
 <div class="app-container">
     <div id="installBanner" class="install-banner" style="display: none;">📲 Установить приложение</div>
 
+    <!-- Главный экран active по умолчанию -->
     <div id="welcomeScreen" class="screen active">
         <div class="app-header welcome-header">
             <h1>СкладРасклад</h1>
@@ -474,9 +469,24 @@
     }
     
     function formatDate(date) { let d = new Date(date); return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`; }
-    function setEditorDateFromNow() { currentEditDate = new Date(); updateEditorTitle(); }
-    function setEditorDateFromHistory(dateStr) { currentEditDate = new Date(dateStr); updateEditorTitle(); }
-    function updateEditorTitle() { const titleElem = document.getElementById("editorTitle"); if (titleElem && currentEditDate) { titleElem.textContent = `Склад-расклад от ${formatDate(currentEditDate)}`; } }
+    function setEditorDateFromNow() { 
+        currentEditDate = new Date(); 
+        if (editorActive) updateEditorTitleByState(); 
+    }
+    function setEditorDateFromHistory(dateStr) { 
+        currentEditDate = new Date(dateStr); 
+        if (editorActive) updateEditorTitleByState(); 
+    }
+    
+    function updateEditorTitleByState() {
+        const titleElem = document.getElementById("editorTitle");
+        if (!titleElem) return;
+        if (editorActive && currentEditDate) {
+            titleElem.textContent = `Склад-расклад от ${formatDate(currentEditDate)}`;
+        } else {
+            titleElem.textContent = "Редактор";
+        }
+    }
     
     function scrollToActiveGroupChip() {
         const activeChip = document.querySelector(".group-chip.active");
@@ -529,7 +539,6 @@
             
             const variantsContainer = document.getElementById("variantsChips");
             const currentVariant = selectedVariant[group.name] || group.variants[0];
-            // Если чипсы ещё не созданы, создаём их один раз
             if (variantsContainer.children.length === 0) {
                 for (let v of group.variants) {
                     let chip = document.createElement("div");
@@ -546,7 +555,6 @@
                     variantsContainer.appendChild(chip);
                 }
             }
-            // Устанавливаем активный класс
             for (let chip of variantsContainer.children) {
                 if (chip.textContent === currentVariant) chip.classList.add("active");
                 else chip.classList.remove("active");
@@ -559,7 +567,6 @@
                 let val = stock[group.name][currentVariant][col] || 0;
                 let row = document.createElement("div");
                 row.className = "color-row";
-                row.setAttribute("data-color", col);
                 let left = document.createElement("div");
                 left.className = "color-info";
                 left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${getColorName(col, fullModelName)}</span>`;
@@ -568,34 +575,26 @@
                 counter.className = "counter";
                 let btnMinus = document.createElement("button");
                 btnMinus.textContent = "−";
+                btnMinus.onclick = (e) => {
+                    e.stopPropagation();
+                    let newVal = Math.max(0, val-1);
+                    updateStockColor(group.name, currentVariant, col, newVal);
+                };
                 let input = document.createElement("input");
                 input.type = "number";
                 input.value = val;
-                let btnPlus = document.createElement("button");
-                btnPlus.textContent = "+";
-                
-                // Исправленные обработчики: читают актуальное значение из input
-                btnMinus.onclick = (e) => {
-                    e.stopPropagation();
-                    let currentVal = parseInt(input.value);
-                    if (isNaN(currentVal)) currentVal = 0;
-                    let newVal = Math.max(0, currentVal - 1);
-                    updateStockColor(group.name, currentVariant, col, newVal);
-                };
-                btnPlus.onclick = (e) => {
-                    e.stopPropagation();
-                    let currentVal = parseInt(input.value);
-                    if (isNaN(currentVal)) currentVal = 0;
-                    let newVal = currentVal + 1;
-                    updateStockColor(group.name, currentVariant, col, newVal);
-                };
                 input.onchange = (e) => {
                     let vv = parseInt(e.target.value);
-                    if (isNaN(vv)) vv = 0;
-                    if (vv < 0) vv = 0;
+                    if(isNaN(vv)) vv=0;
+                    if(vv<0) vv=0;
                     updateStockColor(group.name, currentVariant, col, vv);
                 };
-                
+                let btnPlus = document.createElement("button");
+                btnPlus.textContent = "+";
+                btnPlus.onclick = (e) => {
+                    e.stopPropagation();
+                    updateStockColor(group.name, currentVariant, col, val+1);
+                };
                 counter.append(btnMinus, input, btnPlus);
                 row.appendChild(counter);
                 colorsContainer.appendChild(row);
@@ -605,31 +604,28 @@
     }
     
     function updateStockColor(group, variant, color, val) {
-        if (stock[group] && stock[group][variant]) {
-            stock[group][variant][color] = val;
-        } else {
-            // fallback
-            if (!stock[group]) stock[group] = {};
-            if (!stock[group][variant]) stock[group][variant] = {};
-            stock[group][variant][color] = val;
-        }
+        stock[group][variant][color] = val;
         saveCurrent();
         setDraft();
-        // Обновляем значение в инпуте, если строка существует
-        const row = document.querySelector(`#colorsList .color-row[data-color="${color}"]`);
-        if (row) {
-            const input = row.querySelector('input');
-            if (input) input.value = val;
+        // Обновляем только соответствующую строку
+        const rows = document.querySelectorAll(`#colorsList .color-row`);
+        for (let row of rows) {
+            const iconSpan = row.querySelector('.color-icon');
+            if (iconSpan && iconSpan.textContent === color) {
+                const input = row.querySelector('input');
+                if (input) input.value = val;
+                break;
+            }
         }
     }
     
     function activateEditorWithData(reset = false) {
         if (reset) resetAllData();
         editorActive = true;
-        // Плавное появление активного контента (уже есть анимация в CSS)
         document.getElementById("editorWelcomeCard").style.display = "none";
         document.getElementById("editorActiveContent").classList.add("active");
         document.getElementById("editorBackBtn").style.display = "flex";
+        updateEditorTitleByState();
         renderGroupsChips();
         renderGroupContent();
     }
@@ -639,6 +635,7 @@
         document.getElementById("editorWelcomeCard").style.display = "block";
         document.getElementById("editorActiveContent").classList.remove("active");
         document.getElementById("editorBackBtn").style.display = "none";
+        updateEditorTitleByState();
         const searchInput = document.getElementById("searchInput");
         if (searchInput) searchInput.value = "";
         searchTerm = "";
@@ -770,6 +767,7 @@
                 document.getElementById("editorActiveContent").classList.remove("active");
                 document.getElementById("editorBackBtn").style.display = "none";
                 updateDraftButtons();
+                updateEditorTitleByState();
             } else {
                 document.getElementById("editorWelcomeCard").style.display = "none";
                 document.getElementById("editorActiveContent").classList.add("active");
