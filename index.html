@@ -146,6 +146,23 @@
             text-align: center;
             padding: 32px 20px;
             margin: auto 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .editor-welcome-card.fade-out {
+            opacity: 0;
+            transform: scale(0.98);
+            pointer-events: none;
+        }
+        .editor-active {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            opacity: 0;
+            transform: translateY(8px);
+            display: none;
+        }
+        .editor-active.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
         .editor-welcome-card h3 {
             font-size: 1.4rem;
@@ -154,12 +171,6 @@
         .editor-welcome-card .btn {
             width: 100%;
             margin-bottom: 12px;
-        }
-        .editor-active {
-            display: none;
-        }
-        .editor-active.active {
-            display: block;
         }
         
         .search-wrapper { position: relative; margin-bottom: 16px; }
@@ -240,7 +251,6 @@
 <div class="app-container">
     <div id="installBanner" class="install-banner" style="display: none;">📲 Установить приложение</div>
 
-    <!-- Главный экран active по умолчанию -->
     <div id="welcomeScreen" class="screen active">
         <div class="app-header welcome-header">
             <h1>СкладРасклад</h1>
@@ -607,7 +617,6 @@
         stock[group][variant][color] = val;
         saveCurrent();
         setDraft();
-        // Обновляем только соответствующую строку
         const rows = document.querySelectorAll(`#colorsList .color-row`);
         for (let row of rows) {
             const iconSpan = row.querySelector('.color-icon');
@@ -621,25 +630,52 @@
     
     function activateEditorWithData(reset = false) {
         if (reset) resetAllData();
-        editorActive = true;
-        document.getElementById("editorWelcomeCard").style.display = "none";
-        document.getElementById("editorActiveContent").classList.add("active");
-        document.getElementById("editorBackBtn").style.display = "flex";
-        updateEditorTitleByState();
-        renderGroupsChips();
-        renderGroupContent();
+        const welcomeCard = document.getElementById("editorWelcomeCard");
+        const activeContent = document.getElementById("editorActiveContent");
+        
+        // Убедимся, что карточка видна перед анимацией
+        welcomeCard.style.display = "block";
+        welcomeCard.classList.remove("fade-out");
+        // Принудительно сбросим opacity для активного контента, если он был
+        activeContent.classList.remove("active");
+        activeContent.style.opacity = "";
+        
+        // Анимация исчезновения карточки
+        welcomeCard.classList.add("fade-out");
+        setTimeout(() => {
+            welcomeCard.style.display = "none";
+            welcomeCard.classList.remove("fade-out");
+            // Показываем активный редактор с анимацией появления
+            activeContent.classList.add("active");
+            editorActive = true;
+            document.getElementById("editorBackBtn").style.display = "flex";
+            updateEditorTitleByState();
+            renderGroupsChips();
+            renderGroupContent();
+        }, 200);
     }
     
     function deactivateEditor() {
-        editorActive = false;
-        document.getElementById("editorWelcomeCard").style.display = "block";
-        document.getElementById("editorActiveContent").classList.remove("active");
-        document.getElementById("editorBackBtn").style.display = "none";
-        updateEditorTitleByState();
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput) searchInput.value = "";
-        searchTerm = "";
-        updateDraftButtons();
+        const welcomeCard = document.getElementById("editorWelcomeCard");
+        const activeContent = document.getElementById("editorActiveContent");
+        
+        // Анимация исчезновения активного редактора
+        activeContent.classList.remove("active");
+        activeContent.style.opacity = "0";
+        setTimeout(() => {
+            welcomeCard.style.display = "block";
+            welcomeCard.classList.remove("fade-out"); // убедимся, что класс удалён
+            editorActive = false;
+            document.getElementById("editorBackBtn").style.display = "none";
+            updateEditorTitleByState();
+            // Сброс поиска
+            const searchInput = document.getElementById("searchInput");
+            if (searchInput) searchInput.value = "";
+            searchTerm = "";
+            updateDraftButtons();
+            // Убираем opacity, чтобы при следующей активации было нормально
+            activeContent.style.opacity = "";
+        }, 200);
     }
     
     function newStock() {
@@ -764,6 +800,7 @@
         if (screenId === "editor") {
             if (!editorActive) {
                 document.getElementById("editorWelcomeCard").style.display = "block";
+                document.getElementById("editorWelcomeCard").classList.remove("fade-out");
                 document.getElementById("editorActiveContent").classList.remove("active");
                 document.getElementById("editorBackBtn").style.display = "none";
                 updateDraftButtons();
@@ -885,9 +922,12 @@
         deactivateEditor();
         updateDraftButtons();
         
+        // Подсветка таб-бара при загрузке
         document.querySelectorAll(".nav-item").forEach(btn => {
             btn.onclick = () => showScreen(btn.dataset.screen);
+            if (btn.dataset.screen === "welcome") btn.classList.add("active");
         });
+        
         document.getElementById("editorBackBtn").onclick = () => goBack();
         document.getElementById("historyBackBtn").onclick = () => goBack();
         document.getElementById("goToEditorBtn").onclick = () => showScreen("editor");
@@ -958,6 +998,7 @@
         themeModal.addEventListener("click", (e) => { if(e.target === themeModal) closeThemeModal(); });
         
         currentScreenId = "welcome";
+        // Убедимся, что welcomeScreen активен и таб-бар подсвечен
         if (!document.getElementById("welcomeScreen").classList.contains("active")) {
             showScreen("welcome");
         }
