@@ -28,9 +28,9 @@
             --overlay-bg: rgba(0,0,0,0.7);
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg-page); color: var(--text-primary); line-height: 1.3; padding-bottom: 65px; }
-        .app-container { max-width: 700px; margin: 0 auto; padding: 12px 16px 20px; }
-        .screen { display: none; animation: fadeIn 0.25s ease; }
-        .screen.active { display: block; }
+        .app-container { max-width: 700px; margin: 0 auto; padding: 12px 16px 20px; min-height: 80vh; display: flex; flex-direction: column; }
+        .screen { display: none; animation: fadeIn 0.25s ease; flex: 1; }
+        .screen.active { display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
         .app-header {
@@ -70,20 +70,23 @@
             transform: translateY(-50%);
         }
         .icon-btn {
-            background: var(--surface);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 30px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-sm);
-            flex-shrink: 0;
+        background: var(--surface);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 30px;
+        font-size: 1.3rem;
+        cursor: pointer;
+        color: var(--text-primary);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+        flex-shrink: 0;
+        line-height: 1;
+        padding: 0;
+        text-align: center;
         }
         .icon-btn:active { transform: scale(0.94); background: var(--surface-2); }
         .card { background: var(--surface); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; transition: var(--transition); }
@@ -139,21 +142,50 @@
         .nav-item.active { color: var(--primary); background: var(--surface-2); }
         .nav-item span:first-child { font-size: 1.3rem; }
         .nav-item:active { transform: scale(0.92); }
+        
+        .editor-welcome-card {
+            text-align: center;
+            padding: 32px 20px;
+            margin: auto 0;
+        }
+        .editor-welcome-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 24px;
+        }
+        .editor-welcome-card .btn {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .editor-active {
+            display: none;
+            animation: contentFadeIn 0.2s ease;
+        }
+        .editor-active.active {
+            display: block;
+        }
+        @keyframes contentFadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .search-wrapper { position: relative; margin-bottom: 16px; }
         .search-wrapper input { width: 100%; padding: 12px 48px 12px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 44px; font-size: 0.95rem; color: var(--text-primary); outline: none; transition: var(--transition); }
         .search-wrapper input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,136,229,0.2); }
         .search-clear { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-tertiary); display: none; }
+        
         .groups-scroll { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 12px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
         .groups-chips { display: inline-flex; gap: 8px; padding: 2px 0; }
         .group-chip { background: var(--surface-2); padding: 6px 18px; border-radius: 40px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease, transform 0.1s ease; display: inline-block; }
         .group-chip.active { background: var(--primary); color: white; }
         .group-chip:active { transform: scale(0.94); }
+        
         .group-card { background: var(--surface); border-radius: 24px; padding: 16px; box-shadow: var(--shadow-sm); margin-bottom: 16px; transition: box-shadow 0.2s; }
         .group-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: var(--text-primary); }
         .chip-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 10px; }
         .chip { background: var(--surface-2); padding: 6px 14px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease; }
         .chip.active { background: var(--primary); color: white; }
         .chip:active { transform: scale(0.94); }
+        
         .color-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; transition: opacity 0.15s ease, transform 0.15s ease; }
         .color-list.fade-out { opacity: 0; transform: translateY(4px); }
         .color-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); padding: 8px 12px; border-radius: 20px; transition: all 0.1s ease; }
@@ -166,6 +198,7 @@
         .counter input { width: 40px; text-align: center; font-size: 0.9rem; font-weight: 500; background: transparent; border: none; color: var(--text-primary); font-family: monospace; outline: none; }
         .counter input::-webkit-outer-spin-button, .counter input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .counter input[type=number] { -moz-appearance: textfield; }
+        
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--overlay-bg); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 200; visibility: hidden; opacity: 0; transition: opacity 0.2s, visibility 0.2s; padding: 20px; }
         .modal-overlay.active { visibility: visible; opacity: 1; }
         .modal-content { background: var(--surface); border-radius: 28px; max-width: 500px; width: 100%; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-md); animation: modalPop 0.2s ease; }
@@ -177,15 +210,35 @@
         .modal-body { padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4; background: var(--surface-2); margin: 14px; border-radius: 20px; max-height: 50vh; overflow: auto; }
         .modal-footer { padding: 10px 18px 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .modal-footer .btn { flex: 1; min-width: 100px; text-align: center; white-space: nowrap; }
+        
         .history-item { background: var(--surface); border-radius: 20px; margin-bottom: 10px; padding: 14px; box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); display: flex; justify-content: space-between; align-items: center; }
         .history-item:active { transform: scale(0.98); background: var(--surface-2); }
         .history-date { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
         .history-preview { font-family: monospace; font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
         .history-right { text-align: right; }
         .history-chevron { font-size: 1.1rem; color: var(--text-tertiary); }
+        
         .toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-page); padding: 8px 18px; border-radius: 40px; font-size: 0.8rem; z-index: 210; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; box-shadow: var(--shadow-md); }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-tertiary); }
+        
         @media (max-width: 480px) { .app-header h1 { font-size: 1rem; } .welcome-header h1 { font-size: 1.3rem; } }
+        
+        .editor-actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .editor-actions-bar .btn {
+            flex: 1;
+        }
+        .welcome-card {
+            margin: auto 0;
+        }
+        .theme-btn-active {
+            background: var(--primary) !important;
+            color: white !important;
+        }
     </style>
 </head>
 <body>
@@ -198,12 +251,10 @@
             <h1>СкладРасклад</h1>
             <button id="welcomeThemeToggle" class="icon-btn">🌙</button>
         </div>
-        <div class="card" style="text-align: center; padding: 32px 20px;">
+        <div class="card welcome-card" style="text-align: center; padding: 32px 20px;">
             <img src="./icon-256.png" alt="logo" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 16px;">
             <p style="margin: 16px 0 24px; color: var(--text-secondary); font-size: 1rem;">Создаватель склад-расклада :D</p>
-            <button id="newFromWelcomeBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 12px;">✨ Новый склад-расклад</button>
-            <button id="draftFromWelcomeBtn" class="btn" style="width: 100%; margin-bottom: 12px; display: none;">📝 Черновик</button>
-            <button id="historyFromWelcomeBtn" class="btn" style="width: 100%;">📜 История</button>
+            <button id="goToEditorBtn" class="btn btn-primary" style="width: 100%;">Перейти в редактор →</button>
         </div>
         <footer style="text-align: center; font-size: 12px; margin-top: 24px;">
             Первая в истории конторы приблуда для<br>
@@ -214,14 +265,33 @@
 
     <div id="editorScreen" class="screen">
         <div class="app-header">
-            <button id="editorBackBtn" class="icon-btn">←</button>
+            <button id="editorBackBtn" class="icon-btn" style="display: none;">←</button>
             <h1 id="editorTitle">Редактор</h1>
             <button id="editorThemeToggle" class="icon-btn">🌙</button>
         </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 14px;"><button id="resetBtn" class="btn btn-danger" style="flex:1">Обнулить всё</button><button id="finishBtn" class="btn btn-primary" style="flex:1">Завершить</button></div>
-        <div class="search-wrapper"><input type="text" id="searchInput" placeholder="Поиск модели..."><button id="searchClearBtn" class="search-clear">✕</button></div>
-        <div class="groups-scroll" id="groupsScroll"><div class="groups-chips" id="groupsChips"></div></div>
-        <div id="selectedGroupCard" class="group-card"><div class="group-title" id="groupTitle"></div><div class="chip-bar" id="variantsChips"></div><div id="colorsList" class="color-list"></div></div>
+        
+        <div id="editorWelcomeCard" class="card editor-welcome-card">
+            <h3>✨ Что хотите сделать?</h3>
+            <button id="newInEditorBtn" class="btn btn-primary">✨ Новый склад-расклад</button>
+            <button id="draftInEditorBtn" class="btn" style="display: none;">📂 Открыть черновик</button>
+        </div>
+        
+        <div id="editorActiveContent" class="editor-active">
+            <div class="editor-actions-bar">
+                <button id="resetActiveBtn" class="btn btn-danger">🔄 Обнулить всё</button>
+                <button id="finishActiveBtn" class="btn btn-primary">✅ Завершить</button>
+            </div>
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" placeholder="Поиск модели...">
+                <button id="searchClearBtn" class="search-clear">✕</button>
+            </div>
+            <div class="groups-scroll" id="groupsScroll"><div class="groups-chips" id="groupsChips"></div></div>
+            <div id="selectedGroupCard" class="group-card">
+                <div class="group-title" id="groupTitle"></div>
+                <div class="chip-bar" id="variantsChips"></div>
+                <div id="colorsList" class="color-list"></div>
+            </div>
+        </div>
     </div>
 
     <div id="historyScreen" class="screen">
@@ -231,7 +301,8 @@
             <button id="historyThemeToggle" class="icon-btn">🌙</button>
         </div>
         <button id="clearHistoryBtn" class="btn btn-danger" style="width: 100%; margin-bottom: 16px;">Очистить всю историю</button>
-        <div id="historyList"></div><div id="historyEmptyMsg" class="empty-state">Здесь ничего нет. Сделай склад-расклад и нажми «Завершить»</div>
+        <div id="historyList"></div>
+        <div id="historyEmptyMsg" class="empty-state">Здесь ничего нет. Сделай склад-расклад и нажми «Завершить»</div>
     </div>
 </div>
 
@@ -244,7 +315,6 @@
 <div id="previewModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>📄 Превью</h3><button class="modal-close" id="previewModalCloseBtn">&times;</button></div><div class="modal-body" id="modalPreviewMessage"></div><div class="modal-footer"><button id="modalCopyFinishBtn" class="btn btn-primary">📋 Скопировать и завершить</button></div></div></div>
 <div id="historyModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3 id="historyModalTitle"></h3><button class="modal-close" id="historyModalCloseBtn">&times;</button></div><div class="modal-body" id="historyModalMessage"></div><div class="modal-footer"><button id="historyModalCopyBtn" class="btn btn-primary">Копировать</button><button id="historyModalEditBtn" class="btn">Редактировать</button><button id="historyModalDeleteBtn" class="btn btn-danger">Удалить</button></div></div></div>
 
-<!-- Модальное окно выбора темы -->
 <div id="themeModal" class="modal-overlay" style="z-index: 300;">
     <div class="modal-content" style="max-width: 280px;">
         <div class="modal-header">
@@ -317,62 +387,113 @@
         return "жёлтый";
     }
 
-    let stock = {}, savedHistory = [], searchTerm = "", selectedGroup = GROUPS[0].name, selectedVariant = {}, hasDraft = false, searchDebounce;
+    let stock = {};
+    let savedHistory = [];
+    let searchTerm = "";
+    let selectedGroup = GROUPS[0].name;
+    let selectedVariant = {};
+    let hasDraft = false;
+    let searchDebounce;
     let currentEditDate = null;
-    const STORAGE_CURRENT = "sklad_grouped", STORAGE_HISTORY = "sklad_history", STORAGE_SELECTED_GROUP = "sklad_selected_group";
+    let editorActive = false;
+    let currentThemeMode = "system";
+    let animationTimer = null;
+    
+    const STORAGE_CURRENT = "sklad_grouped";
+    const STORAGE_HISTORY = "sklad_history";
+    const STORAGE_SELECTED_GROUP = "sklad_selected_group";
 
     function initStock() { let st = {}; for (let g of GROUPS) { st[g.name] = {}; for (let v of g.variants) { st[g.name][v] = {}; let cols = getColors(`${g.name} ${v}`); for (let c of cols) st[g.name][v][c] = 0; } } return st; }
+    
     function loadData() {
-        let saved = localStorage.getItem(STORAGE_CURRENT); if (saved) try { stock = JSON.parse(saved); } catch(e) { stock = initStock(); } else stock = initStock();
-        for (let g of GROUPS) { if (!stock[g.name]) stock[g.name] = {}; for (let v of g.variants) { if (!stock[g.name][v]) stock[g.name][v] = {}; let cols = getColors(`${g.name} ${v}`); for (let c of cols) if (stock[g.name][v][c] === undefined) stock[g.name][v][c] = 0; } }
-        let savedHist = localStorage.getItem(STORAGE_HISTORY); if (savedHist) try { savedHistory = JSON.parse(savedHist); } catch(e) { savedHistory = []; } if (!Array.isArray(savedHistory)) savedHistory = [];
-        let savedGroup = localStorage.getItem(STORAGE_SELECTED_GROUP); if (savedGroup && GROUPS.some(g => g.name === savedGroup)) selectedGroup = savedGroup; else selectedGroup = GROUPS[0].name;
+        let saved = localStorage.getItem(STORAGE_CURRENT);
+        if (saved) try { stock = JSON.parse(saved); } catch(e) { stock = initStock(); }
+        else stock = initStock();
+        for (let g of GROUPS) {
+            if (!stock[g.name]) stock[g.name] = {};
+            for (let v of g.variants) {
+                if (!stock[g.name][v]) stock[g.name][v] = {};
+                let cols = getColors(`${g.name} ${v}`);
+                for (let c of cols) if (stock[g.name][v][c] === undefined) stock[g.name][v][c] = 0;
+            }
+        }
+        let savedHist = localStorage.getItem(STORAGE_HISTORY);
+        if (savedHist) try { savedHistory = JSON.parse(savedHist); } catch(e) { savedHistory = []; }
+        if (!Array.isArray(savedHistory)) savedHistory = [];
+        let savedGroup = localStorage.getItem(STORAGE_SELECTED_GROUP);
+        if (savedGroup && GROUPS.some(g => g.name === savedGroup)) selectedGroup = savedGroup;
+        else selectedGroup = GROUPS[0].name;
         for (let g of GROUPS) if (!selectedVariant[g.name]) selectedVariant[g.name] = g.variants[0];
         checkDraft();
         setEditorDateFromNow();
     }
+    
     function saveCurrent() { localStorage.setItem(STORAGE_CURRENT, JSON.stringify(stock)); }
     function saveHistory() { if (savedHistory.length>50) savedHistory=savedHistory.slice(0,50); localStorage.setItem(STORAGE_HISTORY, JSON.stringify(savedHistory)); }
     function saveSelectedGroup() { localStorage.setItem(STORAGE_SELECTED_GROUP, selectedGroup); }
-    function checkDraft() { for (let g of GROUPS) for (let v of g.variants) for (let c of getColors(`${g.name} ${v}`)) if ((stock[g.name]?.[v]?.[c]||0) !== 0) { hasDraft = true; return; } hasDraft = false; }
-    function setDraft() { if (!hasDraft) { hasDraft=true; let btn=document.getElementById("draftFromWelcomeBtn"); if(btn) btn.style.display="flex"; } }
-    function clearDraft() { hasDraft=false; let btn=document.getElementById("draftFromWelcomeBtn"); if(btn) btn.style.display="none"; }
+    
+    function checkDraft() {
+        for (let g of GROUPS) {
+            for (let v of g.variants) {
+                for (let c of getColors(`${g.name} ${v}`)) {
+                    if ((stock[g.name]?.[v]?.[c]||0) !== 0) {
+                        hasDraft = true;
+                        return;
+                    }
+                }
+            }
+        }
+        hasDraft = false;
+    }
+    
+    function setDraft() { if (!hasDraft) { hasDraft = true; updateDraftButtons(); } }
+    function clearDraft() { hasDraft = false; updateDraftButtons(); }
+    
+    function updateDraftButtons() {
+        const draftBtns = document.querySelectorAll('#draftInEditorBtn');
+        draftBtns.forEach(btn => {
+            if (hasDraft) btn.style.display = 'flex';
+            else btn.style.display = 'none';
+        });
+    }
+    
+    function resetAllData() {
+        for (let g of GROUPS) {
+            for (let v of g.variants) {
+                for (let c of getColors(`${g.name} ${v}`)) {
+                    stock[g.name][v][c] = 0;
+                }
+            }
+        }
+        saveCurrent();
+        clearDraft();
+        selectedGroup = GROUPS[0].name;
+        saveSelectedGroup();
+        for (let g of GROUPS) selectedVariant[g.name] = g.variants[0];
+        setEditorDateFromNow();
+    }
     
     function formatDate(date) { let d = new Date(date); return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()}`; }
     function setEditorDateFromNow() { currentEditDate = new Date(); updateEditorTitle(); }
     function setEditorDateFromHistory(dateStr) { currentEditDate = new Date(dateStr); updateEditorTitle(); }
     function updateEditorTitle() { const titleElem = document.getElementById("editorTitle"); if (titleElem && currentEditDate) { titleElem.textContent = `Склад-расклад от ${formatDate(currentEditDate)}`; } }
     
-    function resetAll() {
-        for (let g of GROUPS) for (let v of g.variants) for (let c of getColors(`${g.name} ${v}`)) stock[g.name][v][c] = 0;
-        saveCurrent(); clearDraft(); selectedGroup = GROUPS[0].name; saveSelectedGroup(); for (let g of GROUPS) selectedVariant[g.name] = g.variants[0];
-        setEditorDateFromNow();
-        if (document.getElementById("editorScreen").classList.contains("active")) { renderGroupsChips(); renderGroupContent(); }
-    }
-    function generateMessage() { let lines = []; for (let g of GROUPS) { for (let v of g.variants) { let parts = []; for (let c of getColors(`${g.name} ${v}`)) { let cnt = stock[g.name]?.[v]?.[c] || 0; if (cnt > 0) parts.push(`${cnt}${c}`); } if (parts.length) lines.push(`${g.name} ${v} - ${parts.join(" ")}`); } } return lines.join("\n") || "(пусто)"; }
-    function saveToHistory() { let msg = generateMessage(); let copy = JSON.parse(JSON.stringify(stock)); savedHistory.unshift({ id: Date.now(), date: new Date().toISOString(), stock: copy, fullMessage: msg }); if (savedHistory.length>50) savedHistory.pop(); saveHistory(); clearDraft(); }
-    function updateStock(group, variant, color, val) { stock[group][variant][color] = val; saveCurrent(); setDraft(); renderGroupContent(); }
-
-    function scrollToActiveGroupChip() { 
+    function scrollToActiveGroupChip() {
         const activeChip = document.querySelector(".group-chip.active");
         if (activeChip) activeChip.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
     }
-
-    let groupsChipsContainer = null;
     
     function renderGroupsChips() {
         const container = document.getElementById("groupsChips");
         if (!container) return;
-        groupsChipsContainer = container;
         let filteredGroups = GROUPS;
         if (searchTerm) filteredGroups = GROUPS.filter(g => g.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        
         container.innerHTML = "";
-        for (let g of filteredGroups) { 
-            let chip = document.createElement("div"); 
-            chip.className = "group-chip"; 
-            if (selectedGroup === g.name) chip.classList.add("active"); 
-            chip.textContent = g.name; 
+        for (let g of filteredGroups) {
+            let chip = document.createElement("div");
+            chip.className = "group-chip";
+            if (selectedGroup === g.name) chip.classList.add("active");
+            chip.textContent = g.name;
             chip.onclick = (e) => {
                 e.stopPropagation();
                 if (selectedGroup === g.name) return;
@@ -383,21 +504,21 @@
                 renderGroupContent();
                 scrollToActiveGroupChip();
             };
-            container.appendChild(chip); 
+            container.appendChild(chip);
         }
-        if (filteredGroups.length === 0) { 
-            let emptyDiv = document.createElement("div"); 
-            emptyDiv.textContent = "😕 Модели не найдены"; 
-            emptyDiv.style.padding = "10px"; 
-            emptyDiv.style.color = "var(--text-tertiary)"; 
-            container.appendChild(emptyDiv); 
+        if (filteredGroups.length === 0) {
+            let emptyDiv = document.createElement("div");
+            emptyDiv.textContent = "😕 Модели не найдены";
+            emptyDiv.style.padding = "10px";
+            emptyDiv.style.color = "var(--text-tertiary)";
+            container.appendChild(emptyDiv);
         }
         scrollToActiveGroupChip();
     }
-
-    let animationTimer = null;
+    
     function renderGroupContent() {
-        const group = GROUPS.find(g => g.name === selectedGroup); if (!group) return;
+        const group = GROUPS.find(g => g.name === selectedGroup);
+        if (!group) return;
         const colorsContainer = document.getElementById("colorsList");
         if (!colorsContainer) return;
         
@@ -408,95 +529,276 @@
             
             const variantsContainer = document.getElementById("variantsChips");
             const currentVariant = selectedVariant[group.name] || group.variants[0];
-            variantsContainer.innerHTML = "";
-            for (let v of group.variants) { 
-                let chip = document.createElement("div"); 
-                chip.className = "chip"; 
-                if (currentVariant === v) chip.classList.add("active"); 
-                chip.textContent = v; 
-                chip.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    if (selectedVariant[group.name] === v) return;
-                    for (let child of variantsContainer.children) child.classList.remove("active");
-                    chip.classList.add("active");
-                    selectedVariant[group.name] = v; 
-                    renderGroupContent(); 
-                }; 
-                variantsContainer.appendChild(chip); 
+            // Если чипсы ещё не созданы, создаём их один раз
+            if (variantsContainer.children.length === 0) {
+                for (let v of group.variants) {
+                    let chip = document.createElement("div");
+                    chip.className = "chip";
+                    chip.textContent = v;
+                    chip.onclick = (e) => {
+                        e.stopPropagation();
+                        if (selectedVariant[group.name] === v) return;
+                        for (let child of variantsContainer.children) child.classList.remove("active");
+                        chip.classList.add("active");
+                        selectedVariant[group.name] = v;
+                        renderGroupContent();
+                    };
+                    variantsContainer.appendChild(chip);
+                }
+            }
+            // Устанавливаем активный класс
+            for (let chip of variantsContainer.children) {
+                if (chip.textContent === currentVariant) chip.classList.add("active");
+                else chip.classList.remove("active");
             }
             
-            const fullModelName = `${group.name} ${currentVariant}`; 
+            const fullModelName = `${group.name} ${currentVariant}`;
             const colors = getColors(fullModelName);
             colorsContainer.innerHTML = "";
             for (let col of colors) {
                 let val = stock[group.name][currentVariant][col] || 0;
-                let row = document.createElement("div"); row.className = "color-row";
-                let left = document.createElement("div"); left.className = "color-info"; 
-                left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${getColorName(col, fullModelName)}</span>`; 
+                let row = document.createElement("div");
+                row.className = "color-row";
+                row.setAttribute("data-color", col);
+                let left = document.createElement("div");
+                left.className = "color-info";
+                left.innerHTML = `<span class="color-icon">${col}</span><span class="color-name">${getColorName(col, fullModelName)}</span>`;
                 row.appendChild(left);
-                let counter = document.createElement("div"); counter.className = "counter";
-                let btnMinus = document.createElement("button"); btnMinus.textContent = "−"; 
-                btnMinus.onclick = (e) => { e.stopPropagation(); let newVal = Math.max(0, val-1); updateStock(group.name, currentVariant, col, newVal); };
-                let input = document.createElement("input"); input.type = "number"; input.value = val; 
-                input.onchange = (e) => { let vv = parseInt(e.target.value); if(isNaN(vv)) vv=0; if(vv<0) vv=0; updateStock(group.name, currentVariant, col, vv); };
-                let btnPlus = document.createElement("button"); btnPlus.textContent = "+"; 
-                btnPlus.onclick = (e) => { e.stopPropagation(); updateStock(group.name, currentVariant, col, val+1); };
-                counter.append(btnMinus, input, btnPlus); row.appendChild(counter); colorsContainer.appendChild(row);
+                let counter = document.createElement("div");
+                counter.className = "counter";
+                let btnMinus = document.createElement("button");
+                btnMinus.textContent = "−";
+                let input = document.createElement("input");
+                input.type = "number";
+                input.value = val;
+                let btnPlus = document.createElement("button");
+                btnPlus.textContent = "+";
+                
+                // Исправленные обработчики: читают актуальное значение из input
+                btnMinus.onclick = (e) => {
+                    e.stopPropagation();
+                    let currentVal = parseInt(input.value);
+                    if (isNaN(currentVal)) currentVal = 0;
+                    let newVal = Math.max(0, currentVal - 1);
+                    updateStockColor(group.name, currentVariant, col, newVal);
+                };
+                btnPlus.onclick = (e) => {
+                    e.stopPropagation();
+                    let currentVal = parseInt(input.value);
+                    if (isNaN(currentVal)) currentVal = 0;
+                    let newVal = currentVal + 1;
+                    updateStockColor(group.name, currentVariant, col, newVal);
+                };
+                input.onchange = (e) => {
+                    let vv = parseInt(e.target.value);
+                    if (isNaN(vv)) vv = 0;
+                    if (vv < 0) vv = 0;
+                    updateStockColor(group.name, currentVariant, col, vv);
+                };
+                
+                counter.append(btnMinus, input, btnPlus);
+                row.appendChild(counter);
+                colorsContainer.appendChild(row);
             }
             colorsContainer.classList.remove("fade-out");
         }, 120);
     }
-
-    function renderHistory() { 
-        let container = document.getElementById("historyList"); let empty = document.getElementById("historyEmptyMsg"); 
-        if (!container) return; 
-        if (!savedHistory.length) { container.innerHTML=""; empty.style.display="block"; return; } 
-        empty.style.display="none"; container.innerHTML = ""; 
-        for (let entry of savedHistory) { 
-            let dateStr = new Date(entry.date).toLocaleString(); 
-            let previewText = entry.fullMessage.split("\n")[0] || ""; 
-            if (previewText.length > 50) previewText = previewText.substring(0, 47) + "..."; 
-            let div = document.createElement("div"); div.className = "history-item"; div.setAttribute("data-id", entry.id); 
-            div.innerHTML = `<div><div class="history-date">📅 ${escapeHtml(dateStr)}</div><div class="history-preview">${escapeHtml(previewText)}</div></div><div class="history-right"><span class="history-chevron">›</span></div>`; 
-            div.onclick = () => openHistoryModal(entry.id, dateStr); 
-            container.appendChild(div); 
-        } 
+    
+    function updateStockColor(group, variant, color, val) {
+        if (stock[group] && stock[group][variant]) {
+            stock[group][variant][color] = val;
+        } else {
+            // fallback
+            if (!stock[group]) stock[group] = {};
+            if (!stock[group][variant]) stock[group][variant] = {};
+            stock[group][variant][color] = val;
+        }
+        saveCurrent();
+        setDraft();
+        // Обновляем значение в инпуте, если строка существует
+        const row = document.querySelector(`#colorsList .color-row[data-color="${color}"]`);
+        if (row) {
+            const input = row.querySelector('input');
+            if (input) input.value = val;
+        }
+    }
+    
+    function activateEditorWithData(reset = false) {
+        if (reset) resetAllData();
+        editorActive = true;
+        // Плавное появление активного контента (уже есть анимация в CSS)
+        document.getElementById("editorWelcomeCard").style.display = "none";
+        document.getElementById("editorActiveContent").classList.add("active");
+        document.getElementById("editorBackBtn").style.display = "flex";
+        renderGroupsChips();
+        renderGroupContent();
+    }
+    
+    function deactivateEditor() {
+        editorActive = false;
+        document.getElementById("editorWelcomeCard").style.display = "block";
+        document.getElementById("editorActiveContent").classList.remove("active");
+        document.getElementById("editorBackBtn").style.display = "none";
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) searchInput.value = "";
+        searchTerm = "";
+        updateDraftButtons();
+    }
+    
+    function newStock() {
+        if (hasDraft && !confirm("Есть несохранённый черновик. Обнулить и начать новый?")) return;
+        resetAllData();
+        activateEditorWithData(false);
+    }
+    
+    function openDraft() {
+        if (!hasDraft) {
+            showToast("Нет черновика");
+            return;
+        }
+        activateEditorWithData(false);
+    }
+    
+    function generateMessage() {
+        let lines = [];
+        for (let g of GROUPS) {
+            for (let v of g.variants) {
+                let parts = [];
+                for (let c of getColors(`${g.name} ${v}`)) {
+                    let cnt = stock[g.name]?.[v]?.[c] || 0;
+                    if (cnt > 0) parts.push(`${cnt}${c}`);
+                }
+                if (parts.length) lines.push(`${g.name} ${v} - ${parts.join(" ")}`);
+            }
+        }
+        return lines.join("\n") || "(пусто)";
+    }
+    
+    function saveToHistory() {
+        let msg = generateMessage();
+        let copy = JSON.parse(JSON.stringify(stock));
+        savedHistory.unshift({ id: Date.now(), date: new Date().toISOString(), stock: copy, fullMessage: msg });
+        if (savedHistory.length>50) savedHistory.pop();
+        saveHistory();
+        clearDraft();
+        resetAllData();
+        deactivateEditor();
+        showToast("Отчёт сохранён в истории");
+        showScreen("welcome");
+    }
+    
+    function renderHistory() {
+        let container = document.getElementById("historyList");
+        let empty = document.getElementById("historyEmptyMsg");
+        if (!container) return;
+        if (!savedHistory.length) {
+            container.innerHTML = "";
+            empty.style.display = "block";
+            return;
+        }
+        empty.style.display = "none";
+        container.innerHTML = "";
+        for (let entry of savedHistory) {
+            let dateStr = new Date(entry.date).toLocaleString();
+            let previewText = entry.fullMessage.split("\n")[0] || "";
+            if (previewText.length > 50) previewText = previewText.substring(0, 47) + "...";
+            let div = document.createElement("div");
+            div.className = "history-item";
+            div.setAttribute("data-id", entry.id);
+            div.innerHTML = `<div><div class="history-date">📅 ${escapeHtml(dateStr)}</div><div class="history-preview">${escapeHtml(previewText)}</div></div><div class="history-right"><span class="history-chevron">›</span></div>`;
+            div.onclick = () => openHistoryModal(entry.id, dateStr);
+            container.appendChild(div);
+        }
     }
     
     let currentHistoryId = null;
-    function openHistoryModal(id, dateStr) { 
-        const entry = savedHistory.find(e => e.id === id); if (!entry) return; currentHistoryId = id; 
+    function openHistoryModal(id, dateStr) {
+        const entry = savedHistory.find(e => e.id === id);
+        if (!entry) return;
+        currentHistoryId = id;
         document.getElementById("historyModalTitle").innerHTML = `📅 ${dateStr}`;
-        document.getElementById("historyModalMessage").innerText = entry.fullMessage; 
-        document.getElementById("historyModal").classList.add("active"); 
+        document.getElementById("historyModalMessage").innerText = entry.fullMessage;
+        document.getElementById("historyModal").classList.add("active");
     }
     function closeHistoryModal() { document.getElementById("historyModal").classList.remove("active"); currentHistoryId = null; }
     function copyCurrentHistory() { if (currentHistoryId === null) return; const entry = savedHistory.find(e => e.id === currentHistoryId); if (entry) copyToClipboard(entry.fullMessage, "Скопировано"); }
-    function editCurrentHistory() { 
-        if (currentHistoryId === null) return; 
-        const entry = savedHistory.find(e => e.id === currentHistoryId); 
-        if (entry) { 
-            stock = JSON.parse(JSON.stringify(entry.stock)); saveCurrent(); checkDraft(); 
+    function editCurrentHistory() {
+        if (currentHistoryId === null) return;
+        const entry = savedHistory.find(e => e.id === currentHistoryId);
+        if (entry) {
+            stock = JSON.parse(JSON.stringify(entry.stock));
+            saveCurrent();
+            checkDraft();
             setEditorDateFromHistory(entry.date);
-            renderGroupsChips(); renderGroupContent(); showScreen("editor"); closeHistoryModal(); 
-        } 
+            activateEditorWithData(false);
+            closeHistoryModal();
+            showScreen("editor");
+        }
     }
-    function deleteCurrentHistory() { if (currentHistoryId === null) return; if (confirm("Удалить этот отчёт?")) { savedHistory = savedHistory.filter(e => e.id !== currentHistoryId); saveHistory(); renderHistory(); closeHistoryModal(); showToast("Отчёт удалён"); } }
+    function deleteCurrentHistory() {
+        if (currentHistoryId === null) return;
+        if (confirm("Удалить этот отчёт?")) {
+            savedHistory = savedHistory.filter(e => e.id !== currentHistoryId);
+            saveHistory();
+            renderHistory();
+            closeHistoryModal();
+            showToast("Отчёт удалён");
+        }
+    }
     
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
     function showToast(msg) { let toast=document.getElementById("toast"); toast.textContent=msg; toast.style.opacity="1"; setTimeout(()=>toast.style.opacity="0",2000); }
-    async function copyToClipboard(text,msg) { if(navigator.clipboard && window.isSecureContext) try { await navigator.clipboard.writeText(text); showToast(msg); return; } catch(e){} let ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.top="-9999px"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); if(ok) showToast(msg); else alert("Скопируйте вручную:\n"+text); }
-    const previewModal = document.getElementById("previewModal"); const modalMessage = document.getElementById("modalPreviewMessage");
-    function showPreviewModal() { modalMessage.innerText = generateMessage(); previewModal.classList.add("active"); }
-    function closePreviewModal() { previewModal.classList.remove("active"); }
-    async function onModalCopyFinish() { const msg = generateMessage(); await copyToClipboard(msg, "✅ Скопировано и сохранено!"); saveToHistory(); closePreviewModal(); showScreen("welcome"); renderGroupsChips(); renderGroupContent(); }
-    let currentScreenId = "welcome";
-    function showScreen(screenId) { if (currentScreenId === screenId) return; document.querySelectorAll(".screen").forEach(s => s.classList.remove("active")); document.getElementById(`${screenId}Screen`).classList.add("active"); currentScreenId = screenId; document.querySelectorAll(".nav-item").forEach(item => { if(item.dataset.screen === screenId) item.classList.add("active"); else item.classList.remove("active"); }); if (screenId === "history") renderHistory(); if (screenId === "editor") { renderGroupsChips(); renderGroupContent(); } window.history.pushState({ screen: screenId }, "", `#${screenId}`); }
-    function goBack() { let screens = ["welcome", "editor", "history"]; let idx = screens.indexOf(currentScreenId); if (idx > 0) showScreen(screens[idx-1]); else showToast("Вы на главном экране"); }
-    window.addEventListener("popstate", (e) => { let hash = window.location.hash.slice(1); if (["welcome","editor","history"].includes(hash)) showScreen(hash); else showScreen("welcome"); });
-    window.history.replaceState({ screen: "welcome" }, "", "#welcome");
+    async function copyToClipboard(text,msg) {
+        if(navigator.clipboard && window.isSecureContext) try { await navigator.clipboard.writeText(text); showToast(msg); return; } catch(e){}
+        let ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.top="-9999px"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); if(ok) showToast(msg); else alert("Скопируйте вручную:\n"+text);
+    }
     
-    // =============== УПРАВЛЕНИЕ ТЕМОЙ (светлая / тёмная / системная) ===============
+    let currentScreenId = "welcome";
+    function showScreen(screenId) {
+        if (currentScreenId === screenId) return;
+        document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+        document.getElementById(`${screenId}Screen`).classList.add("active");
+        currentScreenId = screenId;
+        document.querySelectorAll(".nav-item").forEach(item => {
+            if(item.dataset.screen === screenId) item.classList.add("active");
+            else item.classList.remove("active");
+        });
+        if (screenId === "history") renderHistory();
+        if (screenId === "editor") {
+            if (!editorActive) {
+                document.getElementById("editorWelcomeCard").style.display = "block";
+                document.getElementById("editorActiveContent").classList.remove("active");
+                document.getElementById("editorBackBtn").style.display = "none";
+                updateDraftButtons();
+            } else {
+                document.getElementById("editorWelcomeCard").style.display = "none";
+                document.getElementById("editorActiveContent").classList.add("active");
+                document.getElementById("editorBackBtn").style.display = "flex";
+                renderGroupsChips();
+                renderGroupContent();
+            }
+        }
+        window.history.pushState({ screen: screenId }, "", `#${screenId}`);
+    }
+    
+    function goBack() {
+        if (currentScreenId === "editor" && editorActive) {
+            deactivateEditor();
+            updateDraftButtons();
+            return;
+        }
+        let screens = ["welcome", "editor", "history"];
+        let idx = screens.indexOf(currentScreenId);
+        if (idx > 0) showScreen(screens[idx-1]);
+        else showToast("Вы на главном экране");
+    }
+    
+    window.addEventListener("popstate", (e) => {
+        let hash = window.location.hash.slice(1);
+        if (["welcome","editor","history"].includes(hash)) showScreen(hash);
+        else showScreen("welcome");
+    });
+    
     function updateThemeColor() {
         const isDark = document.body.classList.contains('dark');
         const color = isDark ? '#121212' : '#f0f2f5';
@@ -506,20 +808,16 @@
     
     function updateThemeButtons() {
         const isDark = document.body.classList.contains("dark");
-        document.querySelectorAll("#welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle").forEach(btn => {
-            if (btn) btn.textContent = isDark ? "☀️" : "🌙";
+        const btns = document.querySelectorAll("#welcomeThemeToggle, #editorThemeToggle, #historyThemeToggle");
+        btns.forEach(btn => {
+            if (btn) btn.textContent = isDark ? "🌙" : "☀️";
         });
     }
     
-    // Применить тему в зависимости от выбранного режима
-    let currentThemeMode = "system"; // "light", "dark", "system"
-    
     function applyTheme(mode) {
-        if (mode === "light") {
-            document.body.classList.remove("dark");
-        } else if (mode === "dark") {
-            document.body.classList.add("dark");
-        } else if (mode === "system") {
+        if (mode === "light") document.body.classList.remove("dark");
+        else if (mode === "dark") document.body.classList.add("dark");
+        else if (mode === "system") {
             const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (dark) document.body.classList.add("dark");
             else document.body.classList.remove("dark");
@@ -528,42 +826,41 @@
         updateThemeButtons();
     }
     
+    function highlightThemeInModal() {
+        document.getElementById("themeLightBtn").classList.remove("theme-btn-active");
+        document.getElementById("themeDarkBtn").classList.remove("theme-btn-active");
+        document.getElementById("themeSystemBtn").classList.remove("theme-btn-active");
+        if (currentThemeMode === "light") document.getElementById("themeLightBtn").classList.add("theme-btn-active");
+        else if (currentThemeMode === "dark") document.getElementById("themeDarkBtn").classList.add("theme-btn-active");
+        else if (currentThemeMode === "system") document.getElementById("themeSystemBtn").classList.add("theme-btn-active");
+    }
+    
     function setThemeMode(mode) {
         currentThemeMode = mode;
-        if (mode === "system") {
-            localStorage.removeItem("theme");
-        } else {
-            localStorage.setItem("theme", mode);
-        }
+        if (mode === "system") localStorage.removeItem("theme");
+        else localStorage.setItem("theme", mode);
         applyTheme(mode);
+        highlightThemeInModal();
         closeThemeModal();
     }
     
     function initTheme() {
         const saved = localStorage.getItem("theme");
-        if (saved === "light") {
-            currentThemeMode = "light";
-        } else if (saved === "dark") {
-            currentThemeMode = "dark";
-        } else {
-            currentThemeMode = "system";
-        }
+        if (saved === "light") currentThemeMode = "light";
+        else if (saved === "dark") currentThemeMode = "dark";
+        else currentThemeMode = "system";
         applyTheme(currentThemeMode);
-        // Слушаем изменения системной темы, если режим "system"
+        highlightThemeInModal();
         const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
-        darkModeMedia.addEventListener('change', (e) => {
-            if (currentThemeMode === "system") {
-                applyTheme("system");
-            }
+        darkModeMedia.addEventListener('change', () => {
+            if (currentThemeMode === "system") applyTheme("system");
         });
     }
     
-    // Модальное окно выбора темы
     const themeModal = document.getElementById("themeModal");
-    function showThemeModal() { themeModal.classList.add("active"); }
+    function showThemeModal() { highlightThemeInModal(); themeModal.classList.add("active"); }
     function closeThemeModal() { themeModal.classList.remove("active"); }
     
-    // =============== PWA УСТАНОВКА ===============
     let deferredPrompt;
     const installBanner = document.getElementById("installBanner");
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -576,51 +873,96 @@
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === "accepted") {
-                installBanner.style.display = "none";
-            }
+            if (outcome === "accepted") installBanner.style.display = "none";
             deferredPrompt = null;
         });
     }
-    
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => { 
-            navigator.serviceWorker.register('./sw.js').catch(console.error); 
-        });
+        window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
     }
     
     document.addEventListener("DOMContentLoaded", () => {
-        loadData(); initTheme(); renderGroupsChips(); renderGroupContent();
-        document.querySelectorAll(".nav-item").forEach(btn => { btn.onclick = () => showScreen(btn.dataset.screen); });
-        document.getElementById("editorBackBtn").onclick = () => goBack(); document.getElementById("historyBackBtn").onclick = () => goBack();
-        document.getElementById("newFromWelcomeBtn").onclick = () => { if (hasDraft && confirm("Есть несохранённый черновик. Обнулить и начать новый?")) resetAll(); else if (!hasDraft) resetAll(); showScreen("editor"); };
-        document.getElementById("draftFromWelcomeBtn").onclick = () => showScreen("editor"); document.getElementById("historyFromWelcomeBtn").onclick = () => showScreen("history");
+        loadData();
+        initTheme();
+        deactivateEditor();
+        updateDraftButtons();
+        
+        document.querySelectorAll(".nav-item").forEach(btn => {
+            btn.onclick = () => showScreen(btn.dataset.screen);
+        });
+        document.getElementById("editorBackBtn").onclick = () => goBack();
+        document.getElementById("historyBackBtn").onclick = () => goBack();
+        document.getElementById("goToEditorBtn").onclick = () => showScreen("editor");
+        
+        document.getElementById("newInEditorBtn").onclick = newStock;
+        document.getElementById("draftInEditorBtn").onclick = openDraft;
+        document.getElementById("resetActiveBtn").onclick = () => {
+            if (confirm("Обнулить все остатки?")) {
+                resetAllData();
+                if (editorActive) renderGroupContent();
+            }
+        };
+        document.getElementById("finishActiveBtn").onclick = () => {
+            document.getElementById("modalPreviewMessage").innerText = generateMessage();
+            document.getElementById("previewModal").classList.add("active");
+        };
+        
+        const searchInput = document.getElementById("searchInput");
+        const clearBtn = document.getElementById("searchClearBtn");
+        searchInput.addEventListener("input", (e) => {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                searchTerm = e.target.value.toLowerCase();
+                if (editorActive) renderGroupsChips();
+                clearBtn.style.display = searchTerm ? "block" : "none";
+            }, 200);
+        });
+        clearBtn.onclick = () => {
+            searchInput.value = "";
+            searchTerm = "";
+            if (editorActive) renderGroupsChips();
+            clearBtn.style.display = "none";
+            scrollToActiveGroupChip();
+        };
+        
+        document.getElementById("clearHistoryBtn").onclick = () => {
+            if(confirm("Очистить всю историю?")) {
+                savedHistory = [];
+                saveHistory();
+                renderHistory();
+            }
+        };
+        
+        const previewModal = document.getElementById("previewModal");
+        document.getElementById("modalCopyFinishBtn").onclick = async () => {
+            const msg = generateMessage();
+            await copyToClipboard(msg, "✅ Скопировано и сохранено!");
+            saveToHistory();
+            previewModal.classList.remove("active");
+            showScreen("welcome");
+        };
+        document.getElementById("previewModalCloseBtn").onclick = () => previewModal.classList.remove("active");
+        previewModal.addEventListener("click", (e) => { if(e.target === previewModal) previewModal.classList.remove("active"); });
+        
+        document.getElementById("historyModalCopyBtn").onclick = copyCurrentHistory;
+        document.getElementById("historyModalEditBtn").onclick = editCurrentHistory;
+        document.getElementById("historyModalDeleteBtn").onclick = deleteCurrentHistory;
+        document.getElementById("historyModalCloseBtn").onclick = closeHistoryModal;
+        document.getElementById("historyModal").addEventListener("click", (e) => { if(e.target === document.getElementById("historyModal")) closeHistoryModal(); });
+        
         document.getElementById("welcomeThemeToggle").onclick = showThemeModal;
         document.getElementById("editorThemeToggle").onclick = showThemeModal;
         document.getElementById("historyThemeToggle").onclick = showThemeModal;
-        document.getElementById("resetBtn").onclick = () => { if(confirm("Обнулить все остатки?")) resetAll(); };
-        document.getElementById("finishBtn").onclick = () => showPreviewModal(); 
-        const searchInput = document.getElementById("searchInput"); const clearBtn = document.getElementById("searchClearBtn");
-        searchInput.addEventListener("input", (e) => { clearTimeout(searchDebounce); searchDebounce = setTimeout(() => { searchTerm = e.target.value.toLowerCase(); renderGroupsChips(); clearBtn.style.display = searchTerm ? "block" : "none"; }, 200); });
-        clearBtn.onclick = () => { searchInput.value = ""; searchTerm = ""; renderGroupsChips(); clearBtn.style.display = "none"; scrollToActiveGroupChip(); };
-        document.getElementById("clearHistoryBtn").onclick = () => { if(confirm("Очистить всю историю?")) { savedHistory = []; saveHistory(); renderHistory(); } };
-        document.getElementById("modalCopyFinishBtn").onclick = onModalCopyFinish; 
-        document.getElementById("previewModalCloseBtn").onclick = closePreviewModal; 
-        previewModal.addEventListener("click", (e) => { if(e.target === previewModal) closePreviewModal(); });
-        document.getElementById("historyModalCopyBtn").onclick = copyCurrentHistory; 
-        document.getElementById("historyModalEditBtn").onclick = editCurrentHistory; 
-        document.getElementById("historyModalDeleteBtn").onclick = deleteCurrentHistory; 
-        document.getElementById("historyModalCloseBtn").onclick = closeHistoryModal; 
-        document.getElementById("historyModal").addEventListener("click", (e) => { if(e.target === document.getElementById("historyModal")) closeHistoryModal(); });
-        
-        // Кнопки выбора темы
         document.getElementById("themeLightBtn").onclick = () => setThemeMode("light");
         document.getElementById("themeDarkBtn").onclick = () => setThemeMode("dark");
         document.getElementById("themeSystemBtn").onclick = () => setThemeMode("system");
         document.getElementById("themeModalCloseBtn").onclick = closeThemeModal;
         themeModal.addEventListener("click", (e) => { if(e.target === themeModal) closeThemeModal(); });
         
-        if (hasDraft) document.getElementById("draftFromWelcomeBtn").style.display = "flex";
+        currentScreenId = "welcome";
+        if (!document.getElementById("welcomeScreen").classList.contains("active")) {
+            showScreen("welcome");
+        }
     });
 })();
 </script>
